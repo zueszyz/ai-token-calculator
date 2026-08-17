@@ -1,0 +1,42 @@
+{
+  "name": "ai-token-calculator-pro",
+  "version": "1.0.0",
+  "description": "AI Token Calculator Pro",
+  "author": "AI Token Calculator",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never"
+  },
+  "build": {
+    "appId": "com.ai-token-calculator.pro",
+    "productName": "AI Token Calculator Pro",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "electron-main.js",
+      "token-calculator.html"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": null
+    },
+    "portable": {
+      "artifactName": "AI-Token-Calculator-Pro-${version}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^43.2.0",
+    "electron-builder": "^26.15.3",
+    "electron-packager": "^17.1.2"
+  }
+}

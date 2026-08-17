@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Token 计算器 Pro — 全模型编码 · K/M十进制 · 分词可视化 · 价格对比</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh;overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh}
+.header{background:#161b22;border-bottom:1px solid #30363d;padding:8px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.header h1{font-size:1rem;color:#58a6ff;white-space:nowrap}
+.header .badge{font-size:.6rem;background:#1f6feb20;color:#58a6ff;padding:1px 6px;border-radius:8px;border:1px solid #1f6feb40}
+.main{display:flex;flex:1;min-height:0;overflow:hidden}
+.panel{display:flex;flex-direction:column;min-width:0}
+.panel-left{flex:1}
+.panel-right{width:390px;min-width:260px;max-width:70vw;border-left:none;overflow-y:auto;flex-shrink:0;background:#0d1117}
+
+.tabs{display:flex;background:#161b22;border-bottom:1px solid #30363d;position:sticky;top:0;z-index:10}
+.tab{flex:1;text-align:center;padding:9px 3px;font-size:.64rem;color:#8b949e;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab:hover{color:#c9d1d9}
+.tab.on{color:#58a6ff;border-bottom-color:#58a6ff}
+.tab-content{display:none;padding:12px}
+.tab-content.on{display:block}
+
+.toolbar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:#161b22;border-bottom:1px solid #30363d;flex-wrap:wrap;flex-shrink:0}
+.toolbar label,.toolbar span{font-size:.66rem;color:#8b949e;white-space:nowrap}
+.toolbar select,.toolbar .btn{background:#21262d;color:#c9d1d9;border:1px solid #30363d;border-radius:5px;padding:4px 8px;font-size:.7rem;outline:none;cursor:pointer}
+.toolbar select:focus{border-color:#58a6ff}
+.toolbar .btn:hover{background:#30363d;border-color:#58a6ff}
+.toolbar .spacer{flex:1}
+.toolbar .addon{display:flex;align-items:center;gap:3px;font-size:.6rem;color:#484f58}
+.ctx-badge{font-size:.6rem;padding:1px 5px;border-radius:3px;margin-left:4px}
+.ctx-badge.ok{background:#3fb95020;color:#3fb950;border:1px solid #3fb95040}
+.ctx-badge.warn{background:#f778ba20;color:#f778ba;border:1px solid #f778ba40}
+.tokenizer-badge{font-size:.6rem;padding:1px 5px;border-radius:3px;margin-left:2px}
+.tokenizer-badge.real{background:#1f6feb20;color:#58a6ff;border:1px solid #1f6feb40}
+.tokenizer-badge.est{background:#f778ba20;color:#f778ba;border:1px solid #f778ba40}
+
+.input-wrap{flex-shrink:0}
+#textInput{width:100%;height:100px;background:#0d1117;border:none;border-bottom:1px solid #30363d;color:#c9d1d9;padding:12px 14px;font-size:13px;line-height:1.6;resize:vertical;outline:none;font-family:inherit}
+.input-meta{display:flex;gap:12px;padding:5px 12px;font-size:.64rem;color:#8b949e;background:#161b22;border-bottom:1px solid #30363d;flex-wrap:wrap}
+.input-meta strong{color:#58a6ff}
+.stats-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:#30363d;flex-shrink:0}
+.stat-item{background:#161b22;padding:8px 6px;text-align:center}
+.stat-item .val{font-size:1.05rem;font-weight:700;color:#58a6ff}
+.stat-item .lbl{font-size:.55rem;color:#8b949e;margin-top:1px;text-transform:uppercase;letter-spacing:.5px}
+
+.token-viz{flex:1;overflow-y:auto;padding:10px;background:#0d1117}
+.token-viz .tokens-row{display:flex;flex-wrap:wrap;gap:1px;align-items:flex-start}
+.token-chunk{padding:1px 2px;border-radius:2px;font-size:12px;line-height:1.7;cursor:default;white-space:pre-wrap;word-break:break-all;position:relative}
+.token-chunk:hover{outline:2px solid #58a6ff;z-index:2}
+.token-chunk.active{outline:2px solid #f778ba;z-index:2}
+.token-chunk .vis-space{background:rgba(255,255,255,.1);border-radius:2px;padding:0 1px}
+.token-chunk .vis-newline{display:block}
+.no-tokens{color:#484f58;font-size:.8rem;padding:30px;text-align:center}
+.detail-bar{background:#161b22;border-top:1px solid #30363d;padding:7px 14px;display:none;align-items:center;gap:12px;font-size:.68rem;flex-shrink:0}
+.detail-bar span{color:#8b949e}
+.detail-bar strong{color:#58a6ff;font-family:'Cascadia Code',Consolas,monospace;background:#0d1117;padding:1px 6px;border-radius:3px;border:1px solid #30363d}
+.detail-bar code{color:#a371f7;font-family:'Cascadia Code',Consolas,monospace}
+
+/* Tables */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.7rem}
+.cmp-table th{color:#8b949e;font-weight:500;padding:6px 6px;text-align:center;border-bottom:1px solid #30363d;font-size:.62rem;background:#161b22;position:sticky;top:0}
+.cmp-table th:first-child{text-align:left;padding-left:8px}
+.cmp-table td{padding:5px 6px;text-align:center;border-bottom:1px solid #30363d10;vertical-align:middle}
+.cmp-table td:first-child{text-align:left;padding-left:8px}
+.cmp-table tr:hover td{background:rgba(88,166,255,.04)}
+.cmp-table .provider-name{font-weight:600;color:#c9d1d9;font-size:.7rem}
+.cmp-table .provider-sub{font-size:.58rem;color:#8b949e;display:block}
+.cmp-table .cost-val{font-weight:700;font-family:'Cascadia Code',Consolas,monospace;font-size:.68rem}
+.cmp-table .cost-inp{color:#58a6ff}.cmp-table .cost-out{color:#a371f7}.cmp-table .cost-tot{color:#f778ba}
+.cmp-table .best{background:#1f6feb15!important}
+.cmp-table .best td:first-child::before{content:'🏆 ';font-size:.55rem}
+.cmp-table .del-btn{background:none;border:none;color:#f85149;cursor:pointer;font-size:.65rem;padding:0 3px;opacity:.6}
+.cmp-table .del-btn:hover{opacity:1}
+
+/* Model encoding table */
+.enc-table{width:100%;border-collapse:collapse;font-size:.65rem}
+.enc-table th{color:#8b949e;font-weight:500;padding:5px 6px;text-align:left;border-bottom:1px solid #30363d;font-size:.6rem;background:#161b22;position:sticky;top:0}
+.enc-table td{padding:5px 6px;border-bottom:1px solid #30363d10;vertical-align:middle}
+.enc-table .enc-name{font-weight:600;color:#c9d1d9}
+.enc-table .enc-sub{font-size:.58rem;color:#8b949e}
+.enc-table .ctx-tag{font-size:.55rem;padding:1px 5px;border-radius:3px;font-weight:600}
+.enc-table .ct-high{background:#3fb95020;color:#3fb950;border:1px solid #3fb95030}
+.enc-table .ct-mid{background:#f0a04020;color:#f0a040;border:1px solid #f0a04030}
+.enc-table .ct-low{background:#f778ba20;color:#f778ba;border:1px solid #f778ba30}
+
+/* K/M Calculator */
+.km-calc .km-input{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#58a6ff;padding:10px 12px;font-size:1rem;outline:none;font-family:'Cascadia Code',Consolas,monospace;text-align:center;margin-bottom:8px}
+.km-calc .km-input:focus{border-color:#58a6ff}
+.km-calc .km-examples{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.km-calc .km-ex{font-size:.6rem;background:#21262d;color:#8b949e;border:1px solid #30363d;border-radius:4px;padding:3px 8px;cursor:pointer;transition:all .15s}
+.km-calc .km-ex:hover{background:#30363d;color:#58a6ff}
+.km-calc .km-result{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.km-card{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px;text-align:center}
+.km-card .km-label{font-size:.6rem;color:#8b949e;margin-bottom:4px}
+.km-card .km-val{font-size:1.2rem;font-weight:700;font-family:'Cascadia Code',Consolas,monospace}
+.km-card.ai .km-val{color:#58a6ff}
+.km-card.cs .km-val{color:#8b949e}
+.km-note{font-size:.58rem;color:#8b949e;margin-top:8px;text-align:center;line-height:1.5}
+.km-note strong{color:#58a6ff}
+
+/* Context window checker */
+.ctx-checker{margin-top:12px;padding-top:12px;border-top:1px solid #30363d}
+.ctx-checker .ctx-title{font-size:.65rem;color:#8b949e;margin-bottom:8px;font-weight:600}
+.ctx-bar-outer{background:#21262d;border-radius:4px;height:8px;overflow:hidden;margin-bottom:4px}
+.ctx-bar-inner{background:linear-gradient(90deg,#58a6ff,#3fb950);height:100%;border-radius:4px;transition:width .3s}
+.ctx-bar-inner.warning{background:linear-gradient(90deg,#f0a040,#f778ba)}
+.ctx-bar-inner.danger{background:#f85149}
+.ctx-info{display:flex;justify-content:space-between;font-size:.58rem;color:#8b949e}
+
+/* Image */
+.img-est .form-row{display:flex;gap:6px;align-items:end;margin-bottom:8px}
+.img-est label{font-size:.65rem;color:#8b949e;display:block;margin-bottom:2px}
+.img-est input,.img-est select{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;padding:7px 8px;font-size:.75rem;outline:none}
+.img-result{background:#0d1117;border-radius:8px;padding:10px;text-align:center;border:1px solid #30363d;margin-top:6px}
+.img-result .big{font-size:1.3rem;font-weight:700;color:#58a6ff}
+.img-result .sub{font-size:.6rem;color:#8b949e;margin-top:2px}
+
+/* Custom */
+.cust-form{display:flex;flex-direction:column;gap:6px}
+.cust-form .row{display:flex;gap:6px}
+.cust-form input{flex:1;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;padding:7px 8px;font-size:.72rem;outline:none}
+.cust-form .btn-primary{background:#1f6feb;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:.72rem;cursor:pointer;flex:1}
+.saved-tip{font-size:.6rem;color:#3fb950;text-align:center;margin-top:3px;display:none}
+.saved-item{display:flex;justify-content:space-between;align-items:center;padding:5px 6px;border-bottom:1px solid #30363d15;font-size:.65rem}
+.saved-item .si-name{font-weight:600}.saved-item .si-price{color:#8b949e;font-size:.58rem}
+.saved-item button{background:none;border:none;color:#f85149;cursor:pointer;font-size:.7rem}
+
+/* Converter */
+.conv-row{display:flex;gap:5px;align-items:end;margin-bottom:10px}
+.conv-row input{flex:1;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;padding:6px 7px;font-size:.78rem;outline:none;min-width:0}
+.conv-row select{background:#21262d;color:#c9d1d9;border:1px solid #30363d;border-radius:6px;padding:6px 5px;font-size:.66rem;outline:none;cursor:pointer;max-width:80px}
+.conv-row .va{font-weight:700!important;color:#58a6ff!important}
+.conv-row .arr{color:#58a6ff;font-size:.9rem;flex-shrink:0;padding-bottom:4px}
+.ref-tbl{width:100%;border-collapse:collapse;font-size:.64rem}
+.ref-tbl th{color:#8b949e;font-weight:500;padding:5px 7px;text-align:left;border-bottom:1px solid #30363d;font-size:.6rem}
+.ref-tbl td{padding:5px 7px;color:#c9d1d9;border-bottom:1px solid #30363d10}
+.ref-tbl tr:last-child td{border:none}
+
+/* Knowledge */
+.know-card{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px;margin-bottom:8px}
+.know-card h3{font-size:.7rem;color:#58a6ff;margin-bottom:6px}
+.know-card p{font-size:.62rem;color:#8b949e;line-height:1.6;margin-bottom:4px}
+.know-card .highlight{color:#c9d1d9;font-weight:600}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:#484f58}
+
+@media(max-width:768px){
+.main{flex-direction:column}.panel-right{width:100%;border-left:none;border-top:1px solid #30363d;max-height:50vh}
+.stats-bar{grid-template-columns:repeat(3,1fr)}.tabs{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header">
+<h1>🧮 AI Token 计算器 Pro</h1>
+<span class="badge">全模型编码</span>
+<span class="badge">1K=1000 十进制</span>
+<span class="badge">分词可视化</span>
+<span class="badge">价格对比</span>
+<span class="tokenizer-badge est" id="tokenizerBadge">估算模式</span>
+</div>
+
+<div class="main">
+
+<!-- ═══════ LEFT PANEL ═══════ -->
+<div class="panel panel-left">
+<div class="toolbar">
+<label>编码模型：</label>
+<select id="modelSelect">
+<optgroup label="🌍 OpenAI">
+<option value="gpt-4o" data-ctx="128000" data-enc="cl100k_base">GPT-4o — 128K</option>
+<option value="gpt-4o-mini" data-ctx="128000" data-enc="cl100k_base">GPT-4o-mini — 128K</option>
+<option value="gpt-4-turbo" data-ctx="128000" data-enc="cl100k_base">GPT-4 Turbo — 128K</option>
+<option value="gpt-4" data-ctx="8192" data-enc="cl100k_base">GPT-4 — 8K</option>
+<option value="gpt-4-32k" data-ctx="32768" data-enc="cl100k_base">GPT-4 32K</option>
+<option value="gpt-3.5-turbo" data-ctx="16385" data-enc="cl100k_base">GPT-3.5 Turbo — 16K</option>
+<option value="text-davinci-003" data-ctx="4097" data-enc="p50k_base">GPT-3 Davinci — 4K</option>
+<option value="text-embedding-ada-002" data-ctx="8191" data-enc="cl100k_base">Embedding Ada-002 — 8K</option>
+</optgroup>
+<optgroup label="🌍 Anthropic">
+<option value="claude-3.5-sonnet" data-ctx="200000" data-enc="claude">Claude 3.5 Sonnet — 200K</option>
+<option value="claude-3-opus" data-ctx="200000" data-enc="claude">Claude 3 Opus — 200K</option>
+<option value="claude-3-haiku" data-ctx="200000" data-enc="claude">Claude 3 Haiku — 200K</option>
+</optgroup>
+<optgroup label="🌍 Google">
+<option value="gemini-1.5-pro" data-ctx="2097152" data-enc="sentencepiece">Gemini 1.5 Pro — 2M</option>
+<option value="gemini-1.5-flash" data-ctx="1048576" data-enc="sentencepiece">Gemini 1.5 Flash — 1M</option>
+<option value="gemini-2.0-flash" data-ctx="1048576" data-enc="sentencepiece">Gemini 2.0 Flash — 1M</option>
+</optgroup>
+<optgroup label="🌍 Meta">
+<option value="llama-3.1-405b" data-ctx="131072" data-enc="llama3">Llama 3.1 405B — 128K</option>
+<option value="llama-3.1-70b" data-ctx="131072" data-enc="llama3">Llama 3.1 70B — 128K</option>
+<option value="llama-3-8b" data-ctx="8192" data-enc="llama3">Llama 3 8B — 8K</option>
+</optgroup>
+<optgroup label="🌍 Mistral">
+<option value="mistral-large" data-ctx="131072" data-enc="mistral">Mistral Large — 128K</option>
+<option value="mistral-small" data-ctx="32768" data-enc="mistral">Mistral Small — 32K</option>
+</optgroup>
+<optgroup label="🌍 其他国际">
+<option value="cohere-command-r" data-ctx="131072" data-enc="cohere">Cohere Command R+ — 128K</option>
+<option value="grok-1" data-ctx="8192" data-enc="grok">Grok-1 (xAI) — 8K</option>
+</optgroup>
+<optgroup label="🇨🇳 深度求索">
+<option value="deepseek-v3" data-ctx="65536" data-enc="deepseek">DeepSeek-V3 — 64K</option>
+<option value="deepseek-r1" data-ctx="131072" data-enc="deepseek">DeepSeek-R1 — 128K</option>
+<option value="deepseek-coder" data-ctx="16384" data-enc="deepseek">DeepSeek-Coder — 16K</option>
+</optgroup>
+<optgroup label="🇨🇳 阿里云">
+<option value="qwen-max" data-ctx="32768" data-enc="qwen">通义千问-Max — 32K</option>
+<option value="qwen-plus" data-ctx="131072" data-enc="qwen">通义千问-Plus — 128K</option>
+<option value="qwen-turbo" data-ctx="8192" data-enc="qwen">通义千问-Turbo — 8K</option>
+<option value="qwen-long" data-ctx="10485760" data-enc="qwen">通义千问-Long — 10M</option>
+</optgroup>
+<optgroup label="🇨🇳 字节跳动">
+<option value="doubao-pro-256k" data-ctx="262144" data-enc="doubao">豆包 Pro — 256K</option>
+<option value="doubao-pro-32k" data-ctx="32768" data-enc="doubao">豆包 Pro — 32K</option>
+<option value="doubao-lite" data-ctx="4096" data-enc="doubao">豆包 Lite — 4K</option>
+</optgroup>
+<optgroup label="🇨🇳 月之暗面">
+<option value="moonshot-v1-128k" data-ctx="131072" data-enc="moonshot">Kimi (Moonshot) — 128K</option>
+<option value="moonshot-v1-32k" data-ctx="32768" data-enc="moonshot">Kimi (Moonshot) — 32K</option>
+<option value="moonshot-v1-8k" data-ctx="8192" data-enc="moonshot">Kimi (Moonshot) — 8K</option>
+</optgroup>
+<optgroup label="🇨🇳 百度">
+<option value="ernie-4.0" data-ctx="8192" data-enc="ernie">文心一言 4.0 — 8K</option>
+<option value="ernie-3.5" data-ctx="4096" data-enc="ernie">文心一言 3.5 — 4K</option>
+<option value="ernie-speed" data-ctx="131072" data-enc="ernie">ERNIE Speed — 128K</option>
+</optgroup>
+<optgroup label="🇨🇳 智谱 AI">
+<option value="glm-4" data-ctx="131072" data-enc="glm">GLM-4 — 128K</option>
+<option value="glm-4-plus" data-ctx="131072" data-enc="glm">GLM-4 Plus — 128K</option>
+<option value="glm-3-turbo" data-ctx="32768" data-enc="glm">GLM-3 Turbo — 32K</option>
+</optgroup>
+<optgroup label="🇨🇳 其他国内模型">
+<option value="minimax-abab6.5" data-ctx="245760" data-enc="minimax">MiniMax-abab6.5 — 245K</option>
+<option value="yi-large" data-ctx="32768" data-enc="yi">零一万物 Yi-Large — 32K</option>
+<option value="baichuan4" data-ctx="32768" data-enc="baichuan">百川 4 — 32K</option>
+<option value="step-2" data-ctx="131072" data-enc="step">阶跃星辰 Step-2 — 128K</option>
+<option value="spark-v3" data-ctx="8192" data-enc="spark">讯飞星火 V3 — 8K</option>
+<option value="hunyuan-pro" data-ctx="32768" data-enc="hunyuan">腾讯混元 Pro — 32K</option>
+</optgroup>
+</select>
+<span class="spacer"></span>
+<span class="addon">输出 Token：</span>
+<input type="number" id="outputTokens" value="0" min="0" style="width:60px;background:#21262d;color:#c9d1d9;border:1px solid #30363d;border-radius:5px;padding:3px 6px;font-size:.7rem;outline:none" onchange="updateAll()" oninput="updateAll()">
+<span class="addon">窗口用量：</span>
+<span class="ctx-badge ok" id="ctxUsage">0%</span>
+<button class="btn" onclick="app.clear()">🗑</button>
+<button class="btn" onclick="app.copyTokens()">📋</button>
+<button class="btn" onclick="app.copyIds()">🔢</button>
+</div>
+
+<div class="input-wrap">
+<textarea id="textInput" oninput="update()" placeholder="在此输入文本，实时查看分词结果...&#10;&#10;The quick brown fox 🦊 jumps over the lazy dog.&#10;AI 如何将「你好世界」拆分为 tokens？"></textarea>
+</div>
+<div class="input-meta">
+<span>字符：<strong id="charCount">0</strong></span>
+<span>字节(UTF-8)：<strong id="byteCount">0</strong></span>
+<span>行数：<strong id="lineCount">0</strong></span>
+<span>中文字符：<strong id="cnCharCount">0</strong></span>
+<span>输入 Token：<strong id="inputTokenCount">0</strong></span>
+<span>上下文窗口：<strong id="ctxWindow">—</strong></span>
+</div>
+<div class="stats-bar">
+<div class="stat-item"><div class="val" id="tokenCount">0</div><div class="lbl">Tokens</div></div>
+<div class="stat-item"><div class="val" id="uniqueCount">0</div><div class="lbl">Token 类型</div></div>
+<div class="stat-item"><div class="val" id="avgRatio">0</div><div class="lbl">字符/Token</div></div>
+<div class="stat-item"><div class="val" id="spaceCount">0</div><div class="lbl">空白 Token</div></div>
+<div class="stat-item"><div class="val" id="totalWithOutput">0</div><div class="lbl">总消耗 (I+O)</div></div>
+<div class="stat-item"><div class="val" id="wordsEst">0</div><div class="lbl">≈ 英文词</div></div>
+</div>
+
+<div class="token-viz" id="tokenViz">
+<div class="no-tokens">👆 在上方输入文本，查看实时分词效果</div>
+</div>
+
+<div class="detail-bar" id="detailBar">
+<span>Token：<strong id="detailToken">—</strong></span>
+<span>ID：<code id="detailId">—</code></span>
+<span>位置：<strong id="detailPos">—</strong></span>
+<span>字节：<strong id="detailBytes">—</strong></span>
+</div>
+</div>
+
+<!-- Draggable divider (full-height, grab anywhere) -->
+<div id="panelDivider" style="width:16px;background:transparent;cursor:col-resize;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;z-index:5"
+  onmousedown="app.startDrag(event)">
+<div style="width:2px;height:100%;background:#30363d;transition:all .15s;border-radius:1px" id="dividerLine"></div>
+<div style="width:2px;height:32px;border-radius:1px;background:#484f58;transition:all .15s;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)" id="dividerHandle"></div>
+</div>
+<style>
+#panelDivider:hover #dividerLine{background:#58a6ff!important}
+#panelDivider:hover #dividerHandle{background:#58a6ff;height:48px}
+#panelDivider.dragging #dividerLine{background:#58a6ff!important}
+#panelDivider.dragging #dividerHandle{background:#58a6ff;height:48px}
+</style>
+
+<!-- ═══════ RIGHT PANEL ═══════ -->
+<div class="panel panel-right" id="panelRight">
+<div class="tabs">
+<div class="tab on" onclick="app.switchTab('compare')">📊 对比</div>
+<div class="tab" onclick="app.switchTab('kmcalc')">🔢 1K=1000</div>
+<div class="tab" onclick="app.switchTab('models')">🧬 编码</div>
+<div class="tab" onclick="app.switchTab('image')">🖼 图片</div>
+<div class="tab" onclick="app.switchTab('convert')">🔄 换算</div>
+<div class="tab" onclick="app.switchTab('custom')">➕ 自定义</div>
+<div class="tab" onclick="app.switchTab('knowledge')">📖 知识</div>
+</div>
+
+<!-- Tab 1: Price Comparison -->
+<div class="tab-content on" id="tab-compare">
+<div style="overflow-x:auto">
+<table class="cmp-table">
+<thead><tr><th>服务商</th><th>$/1M 入</th><th>$/1M 出</th><th>输入费</th><th>输出费</th><th>总计</th></tr></thead>
+<tbody id="cmpBody"></tbody>
+</table>
+</div>
+<div style="font-size:.58rem;color:#8b949e;margin-top:4px;text-align:center">
+🏆 高亮=最便宜 &nbsp;|&nbsp; 基于 AI 行业十进制（1M=1,000,000）
+</div>
+</div>
+
+<!-- Tab 2: 1K=1000 Calculator -->
+<div class="tab-content" id="tab-kmcalc">
+<div class="km-calc">
+<div style="font-size:.6rem;color:#8b949e;margin-bottom:4px;text-align:center">
+输入 Token 数量（支持 K / M / 千 / 万 / 亿 简写）
+</div>
+<input type="text" class="km-input" id="kmInput" value="128000" oninput="app.calcKM()" placeholder="如：128K、1M、5万、1亿、100000">
+<div class="km-examples" style="margin-bottom:4px">
+<span class="km-ex" onclick="app.presetKM('1千')">1千</span>
+<span class="km-ex" onclick="app.presetKM('1万')">1万</span>
+<span class="km-ex" onclick="app.presetKM('5万')">5万</span>
+<span class="km-ex" onclick="app.presetKM('10万')">10万</span>
+<span class="km-ex" onclick="app.presetKM('100万')">100万</span>
+<span class="km-ex" onclick="app.presetKM('1000万')">1千万</span>
+<span class="km-ex" onclick="app.presetKM('1亿')">1亿</span>
+<span class="km-ex" onclick="app.presetKM('10亿')">10亿</span>
+</div>
+<div class="km-examples">
+<span class="km-ex" onclick="app.presetKM('4K')">4K</span>
+<span class="km-ex" onclick="app.presetKM('8K')">8K</span>
+<span class="km-ex" onclick="app.presetKM('16K')">16K</span>
+<span class="km-ex" onclick="app.presetKM('32K')">32K</span>
+<span class="km-ex" onclick="app.presetKM('64K')">64K</span>
+<span class="km-ex" onclick="app.presetKM('128K')">128K</span>
+<span class="km-ex" onclick="app.presetKM('200K')">200K</span>
+<span class="km-ex" onclick="app.presetKM('256K')">256K</span>
+<span class="km-ex" onclick="app.presetKM('1M')">1M</span>
+<span class="km-ex" onclick="app.presetKM('2M')">2M</span>
+<span class="km-ex" onclick="app.presetKM('10M')">10M</span>
+</div>
+<div class="km-result" style="grid-template-columns:1fr 1fr 1fr">
+<div class="km-card ai">
+<div class="km-label">🤖 AI 十进制</div>
+<div class="km-val" id="kmAI">128,000</div>
+<div style="font-size:.55rem;color:#484f58;margin-top:2px">1K=1,000 / 1M=1,000,000</div>
+</div>
+<div class="km-card" style="border-color:#f0a04040">
+<div class="km-label">🇨🇳 中文单位</div>
+<div class="km-val" style="color:#f0a040" id="kmCN">12.8万</div>
+<div style="font-size:.55rem;color:#484f58;margin-top:2px">千 / 万 / 亿</div>
+</div>
+<div class="km-card cs">
+<div class="km-label">💻 计算机二进制</div>
+<div class="km-val" id="kmCS">125.0 KiB</div>
+<div style="font-size:.55rem;color:#484f58;margin-top:2px">1KiB=1,024B (≠Token)</div>
+</div>
+</div>
+<div class="km-note" id="kmNote">
+⚠️ AI 行业<strong>不</strong>使用计算机的 1024 进制<br>
+Token 的 K = <strong>1,000</strong>，M = <strong>1,000,000</strong>，万 = <strong>10,000</strong>，亿 = <strong>100,000,000</strong>
+</div>
+
+<div class="ctx-checker" id="ctxChecker"></div>
+</div>
+</div>
+
+<!-- Tab 3: Model Encodings Reference -->
+<div class="tab-content" id="tab-models">
+<div style="overflow-x:auto">
+<table class="enc-table">
+<thead><tr><th>模型</th><th>类别</th><th>编码方案</th><th>窗口</th><th>厂商</th></tr></thead>
+<tbody id="encBody"></tbody>
+</table>
+<div style="font-size:.55rem;color:#8b949e;margin-top:4px;text-align:center">
+来源：知乎专栏「国内外知名大模型及应用」持续更新
+</div>
+</div>
+</div>
+
+<!-- Tab 4: Image -->
+<div class="tab-content" id="tab-image">
+<div class="img-est">
+<!-- Upload area -->
+<div style="border:2px dashed #30363d;border-radius:8px;padding:15px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px"
+  id="imgDropZone" onclick="document.getElementById('imgFileInput').click()"
+  ondragover="event.preventDefault();this.style.borderColor='#58a6ff';this.style.background='rgba(88,166,255,.05)'"
+  ondragleave="this.style.borderColor='#30363d';this.style.background='transparent'"
+  ondrop="event.preventDefault();this.style.borderColor='#30363d';this.style.background='transparent';app.handleImageDrop(event)">
+<input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="app.handleImageUpload(event)">
+<div style="font-size:.7rem;color:#8b949e;margin-bottom:4px">📁 点击上传或拖拽图片到此处</div>
+<div style="font-size:.58rem;color:#484f58">支持 JPG / PNG / WebP / GIF</div>
+</div>
+<!-- Preview -->
+<div id="imgPreview" style="display:none;text-align:center;margin-bottom:10px;position:relative">
+<img id="imgPreviewImg" style="max-width:100%;max-height:120px;border-radius:6px;border:1px solid #30363d">
+<button onclick="app.clearImage()" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);border:none;color:#f85149;cursor:pointer;font-size:.9rem;border-radius:50%;width:22px;height:22px;line-height:1">✕</button>
+<div style="font-size:.6rem;color:#8b949e;margin-top:4px" id="imgPreviewInfo"></div>
+</div>
+<div class="form-row">
+<div style="flex:1"><label>宽度 (px)</label><input type="number" id="imgWidth" value="1024" min="1" oninput="app.calcImage()"></div>
+<div style="flex:1"><label>高度 (px)</label><input type="number" id="imgHeight" value="1024" min="1" oninput="app.calcImage()"></div>
+</div>
+<div class="form-row">
+<div style="flex:1"><label>质量</label><select id="imgQuality" onchange="app.calcImage()">
+<option value="low">低分辨率</option><option value="high" selected>高分辨率</option><option value="auto">自动</option></select></div>
+<div style="flex:1"><label>数量</label><input type="number" id="imgCount" value="1" min="1" oninput="app.calcImage()"></div>
+</div>
+<div class="img-result"><div class="big" id="imgTokens">765</div><div class="sub">预估图片 Tokens</div></div>
+<div id="imgDetailRow" style="font-size:.55rem;color:#8b949e;margin-top:4px">
+GPT-4o Vision: low=85, high=85 base+170/tile (512×512)
+</div>
+</div>
+</div>
+
+<!-- Tab 5: Converter -->
+<div class="tab-content" id="tab-convert">
+<div class="conv-row">
+<input type="text" id="convInput" value="1000" oninput="app.convert()" style="max-width:90px" placeholder="支持 K/M">
+<select id="convFrom" onchange="app.convert()"><option value="token">Token</option><option value="char">字符</option><option value="word">英文词</option><option value="cn_char">中文字</option><option value="kb">KB文本</option><option value="page">页(500字)</option></select>
+<span class="arr">→</span>
+<input type="text" id="convResult" class="va" value="4000" readonly style="max-width:90px">
+<select id="convTo" onchange="app.convert()"><option value="token">Token</option><option value="char" selected>字符</option><option value="word">英文词</option><option value="cn_char">中文字</option><option value="kb">KB文本</option><option value="page">页(500字)</option></select>
+</div>
+<table class="ref-tbl">
+<thead><tr><th>单位</th><th>≈ Token</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>1 英文字母</td><td>~0.25</td><td>1 token ≈ 4 字符</td></tr>
+<tr><td>1 英文单词</td><td>~1.3</td><td>1000 token ≈ 750 单词</td></tr>
+<tr><td>1 中文字</td><td>~1.2-2</td><td>中文消耗更多 token</td></tr>
+<tr><td>1 Emoji</td><td>~2-8</td><td>含肤色/ZJW 修饰</td></tr>
+<tr><td>1 KB 纯文本</td><td>~250</td><td>英文为主</td></tr>
+<tr><td>1 页 ~500 汉字</td><td>~900</td><td>中文实测</td></tr>
+<tr><td>1 分钟语音</td><td>~200</td><td>Whisper 转写</td></tr>
+<tr><td>代码 100 行</td><td>~800</td><td>编程语言紧凑</td></tr>
+<tr><td>1 张 512×512 图</td><td>170</td><td>GPT-4o Vision low</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Tab 6: Custom -->
+<div class="tab-content" id="tab-custom">
+<div class="cust-form">
+<div class="row"><input type="text" id="custName" placeholder="服务商名称，如：豆包"></div>
+<div class="row">
+<input type="number" id="custInputPrice" placeholder="输入价格 $/1M" step="0.0001" min="0">
+<input type="number" id="custOutputPrice" placeholder="输出价格 $/1M" step="0.0001" min="0">
+</div>
+<div class="row">
+<select id="custCurrency" style="background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#c9d1d9;padding:7px 8px;font-size:.72rem;outline:none;width:90px">
+<option value="$">$ (USD)</option><option value="¥">¥ (CNY)</option></select>
+<button class="btn-primary" onclick="app.addCustom()">➕ 添加</button>
+</div>
+<div class="saved-tip" id="savedTip">✅ 已添加！</div>
+</div>
+<div style="max-height:140px;overflow-y:auto;margin-top:6px" id="savedList"></div>
+<div style="font-size:.58rem;color:#8b949e;margin-top:4px;text-align:center">
+数据保存在浏览器本地，不会上传
+</div>
+</div>
+
+<!-- Tab 7: Knowledge -->
+<div class="tab-content" id="tab-knowledge">
+<div class="know-card">
+<h3>💡 什么是 Token？</h3>
+<p>Token（词元）是 AI 能理解的<span class="highlight">最小文本单位</span>。AI 不会逐个字母处理文字，而是把文本切成一块块的碎片，每一块就是一个 Token。</p>
+<p>一个好记的比喻：把文章想象成一块 <span class="highlight">比萨🍕</span>——你不会整块吞下，也不会碾成粉末，而是切成一口大小。Token 就是这个"一口大小"。</p>
+</div>
+<div class="know-card">
+<h3>📐 Token 比单词更细，比字母更粗</h3>
+<p>• <span class="highlight">"cat"</span> → 1 token（常见词）</p>
+<p>• <span class="highlight">"unbelievable"</span> → 3 tokens（un·believ·able）</p>
+<p>• <span class="highlight">"ChatGPT"</span> → 3 tokens（Chat·G·PT）</p>
+<p>• <span class="highlight">"你好"</span> → 2~3 tokens（中文消耗更多）</p>
+</div>
+<div class="know-card">
+<h3>🔢 AI 行业 Token 计量：十进制</h3>
+<p>AI 行业严格遵循<span class="highlight">国际单位制十进制</span>：</p>
+<p>• <span class="highlight">1K = 1,000 Token</span>（不是 1,024）</p>
+<p>• <span class="highlight">1M = 1,000,000 Token</span>（即 100 万）</p>
+<p>这与计算机存储（KB=1024 Bytes）<span class="highlight">完全不同</span>！</p>
+</div>
+<div class="know-card">
+<h3>📊 常见上下文窗口</h3>
+<p>• GPT-3.5：<span class="highlight">4K</span> &nbsp; GPT-4o：<span class="highlight">128K</span></p>
+<p>• Claude 3.5：<span class="highlight">200K</span> &nbsp; Gemini 1.5 Pro：<span class="highlight">2M</span></p>
+<p>• 豆包 Pro：<span class="highlight">256K</span> &nbsp; 通义千问-Long：<span class="highlight">10M</span></p>
+<p>超过窗口限制，AI 就会"忘记"之前的内容。</p>
+</div>
+<div class="know-card">
+<h3>💰 Token 影响费用和速度</h3>
+<p>• API 调用按<span class="highlight">输入+输出</span> Token 总量计费</p>
+<p>• AI 生成文字是<span class="highlight">逐 Token 输出</span>的，越长越慢</p>
+<p>• 空格和标点<span class="highlight">也算 Token</span>！</p>
+<p>• 代码比自然语言<span class="highlight">更省 Token</span></p>
+</div>
+<div class="know-card">
+<h3>🌐 大模型生态全景（2026）</h3>
+<p>本文模型数据参考知乎专栏「<span class="highlight">国内外知名大模型及应用</span>」持续更新的全景目录：</p>
+<p>• <span style="color:#58a6ff">对话类</span>：GPT-4o、Claude、Gemini、DeepSeek、豆包、Kimi 等</p>
+<p>• <span style="color:#a371f7">多模态</span>：GPT-4o Vision、Gemini、Qwen-VL、GLM-4V、Seedream</p>
+<p>• <span style="color:#f778ba">推理类</span>：o1/o3、DeepSeek-R1、QwQ-Max、ERNIE 4.5</p>
+<p>• <span style="color:#3fb950">代码类</span>：DeepSeek-Coder、Codex、Copilot</p>
+<p>• <span style="color:#f0a040">视频生成</span>：Sora、Veo、Seedance、Hailuo、可灵、即梦、Pika、Runway</p>
+<p>• <span style="color:#8b949e">图像/音乐</span>：DALL·E 3、Midjourney、SD3、Suno、Udio</p>
+<p style="font-size:.58rem;color:#484f58">完整模型列表请查看「🧬 编码」标签页 — 共收录 65+ 模型</p>
+</div>
+</div>
+
+</div><!-- /right -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════
+//  STATE & CONSTANTS
+// ═══════════════════════════════════════
+const PALETTE = [
+{bg:'rgba(255,107,107,.22)',bd:'rgba(255,107,107,.45)'},{bg:'rgba(254,202,87,.22)',bd:'rgba(254,202,87,.45)'},
+{bg:'rgba(72,219,251,.22)',bd:'rgba(72,219,251,.45)'},{bg:'rgba(255,159,243,.22)',bd:'rgba(255,159,243,.45)'},
+{bg:'rgba(84,160,255,.22)',bd:'rgba(84,160,255,.45)'},{bg:'rgba(95,39,205,.22)',bd:'rgba(95,39,205,.45)'},
+{bg:'rgba(1,163,164,.22)',bd:'rgba(1,163,164,.45)'},{bg:'rgba(243,104,224,.22)',bd:'rgba(243,104,224,.45)'},
+{bg:'rgba(46,213,115,.22)',bd:'rgba(46,213,115,.45)'},{bg:'rgba(255,165,2,.22)',bd:'rgba(255,165,2,.45)'},
+{bg:'rgba(112,161,255,.22)',bd:'rgba(112,161,255,.45)'},{bg:'rgba(83,82,237,.22)',bd:'rgba(83,82,237,.45)'},
+{bg:'rgba(255,71,87,.22)',bd:'rgba(255,71,87,.45)'},{bg:'rgba(46,213,115,.22)',bd:'rgba(46,213,115,.45)'},
+{bg:'rgba(30,144,255,.22)',bd:'rgba(30,144,255,.45)'},{bg:'rgba(236,204,104,.22)',bd:'rgba(236,204,104,.45)'},
+{bg:'rgba(43,203,186,.22)',bd:'rgba(43,203,186,.45)'},{bg:'rgba(69,170,242,.22)',bd:'rgba(69,170,242,.45)'},
+{bg:'rgba(252,92,101,.22)',bd:'rgba(252,92,101,.45)'},{bg:'rgba(38,222,129,.22)',bd:'rgba(38,222,129,.45)'},
+{bg:'rgba(250,130,49,.22)',bd:'rgba(250,130,49,.45)'},{bg:'rgba(165,94,234,.22)',bd:'rgba(165,94,234,.45)'},
+{bg:'rgba(255,107,129,.22)',bd:'rgba(255,107,129,.45)'},{bg:'rgba(72,219,200,.22)',bd:'rgba(72,219,200,.45)'},
+];
+
+const DEFAULT_PROVIDERS = [
+// 🌍 OpenAI
+{id:'gpt4o',name:'GPT-4o',desc:'OpenAI',input:2.50,output:10.00,curr:'$'},
+{id:'gpt4o-mini',name:'GPT-4o-mini',desc:'OpenAI',input:0.15,output:0.60,curr:'$'},
+{id:'gpt4-turbo',name:'GPT-4 Turbo',desc:'OpenAI',input:10.00,output:30.00,curr:'$'},
+{id:'gpt35-turbo',name:'GPT-3.5 Turbo',desc:'OpenAI',input:0.50,output:1.50,curr:'$'},
+{id:'o1',name:'o1',desc:'OpenAI推理',input:15.00,output:60.00,curr:'$'},
+{id:'o3-mini',name:'o3-mini',desc:'OpenAI推理',input:1.10,output:4.40,curr:'$'},
+// 🌍 Anthropic
+{id:'claude35',name:'Claude 3.5 Sonnet',desc:'Anthropic',input:3.00,output:15.00,curr:'$'},
+{id:'claude3-opus',name:'Claude 3 Opus',desc:'Anthropic',input:15.00,output:75.00,curr:'$'},
+{id:'claude3-haiku',name:'Claude 3 Haiku',desc:'Anthropic',input:0.25,output:1.25,curr:'$'},
+// 🌍 Google
+{id:'gemini25pro',name:'Gemini 2.5 Pro',desc:'Google',input:1.25,output:10.00,curr:'$'},
+{id:'gemini20flash',name:'Gemini 2.0 Flash',desc:'Google',input:0.10,output:0.40,curr:'$'},
+{id:'gemini15pro',name:'Gemini 1.5 Pro',desc:'Google',input:1.25,output:5.00,curr:'$'},
+// 🌍 Meta
+{id:'llama31-405b',name:'Llama 3.1 405B',desc:'Meta (开源)',input:0.00,output:0.00,curr:'$'},
+// 🌍 Mistral
+{id:'mistral-large',name:'Mistral Large',desc:'Mistral',input:2.00,output:6.00,curr:'$'},
+// 🌍 xAI
+{id:'grok-2',name:'Grok-2',desc:'xAI',input:2.00,output:10.00,curr:'$'},
+// 🇨🇳 DeepSeek
+{id:'deepseek-v3',name:'DeepSeek-V3',desc:'深度求索',input:0.27,output:1.10,curr:'¥'},
+{id:'deepseek-r1',name:'DeepSeek-R1',desc:'深度求索推理',input:1.00,output:4.00,curr:'¥'},
+// 🇨🇳 阿里云
+{id:'qwen-max',name:'通义千问-Max',desc:'阿里云',input:2.80,output:11.20,curr:'¥'},
+{id:'qwen-plus',name:'通义千问-Plus',desc:'阿里云',input:0.80,output:2.00,curr:'¥'},
+{id:'qwen-turbo',name:'通义千问-Turbo',desc:'阿里云',input:0.30,output:0.60,curr:'¥'},
+// 🇨🇳 字节跳动
+{id:'doubao-pro',name:'豆包 Pro-256K',desc:'字节跳动',input:0.80,output:2.00,curr:'¥'},
+{id:'doubao-lite',name:'豆包 Lite',desc:'字节跳动',input:0.30,output:0.60,curr:'¥'},
+// 🇨🇳 月之暗面
+{id:'moonshot-v1',name:'Kimi (Moonshot)',desc:'月之暗面',input:3.00,output:12.00,curr:'¥'},
+// 🇨🇳 百度
+{id:'ernie-4',name:'文心一言 4.0',desc:'百度',input:17.14,output:17.14,curr:'¥'},
+{id:'ernie-speed',name:'ERNIE Speed',desc:'百度',input:0.80,output:2.40,curr:'¥'},
+// 🇨🇳 智谱AI
+{id:'glm-4',name:'GLM-4',desc:'智谱AI',input:14.29,output:14.29,curr:'¥'},
+{id:'glm-4-flash',name:'GLM-4 Flash',desc:'智谱AI',input:0.10,output:0.10,curr:'¥'},
+// 🇨🇳 MiniMax
+{id:'minimax-abab',name:'MiniMax-abab6.5',desc:'MiniMax',input:5.00,output:15.00,curr:'¥'},
+// 🇨🇳 零一万物
+{id:'yi-large',name:'Yi-Large',desc:'零一万物',input:2.80,output:11.20,curr:'¥'},
+// 🇨🇳 百川智能
+{id:'baichuan4',name:'百川 4',desc:'百川智能',input:14.29,output:14.29,curr:'¥'},
+// 🇨🇳 阶跃星辰
+{id:'step-2',name:'阶跃星辰 Step-2',desc:'阶跃星辰',input:2.80,output:11.20,curr:'¥'},
+// 🇨🇳 科大讯飞
+{id:'spark-v4',name:'讯飞星火 V4',desc:'科大讯飞',input:2.86,output:8.57,curr:'¥'},
+// 🇨🇳 腾讯
+{id:'hunyuan-pro',name:'腾讯混元 Pro',desc:'腾讯',input:2.86,output:8.57,curr:'¥'},
+// 🇨🇳 商汤
+{id:'sensenova',name:'商汤日日新 5.0',desc:'商汤科技',input:5.00,output:15.00,curr:'¥'},
+];
+
+// All models for encoding reference
+// cat: 对话/多模态/推理/代码/视频/嵌入
+const ALL_MODELS = [
+{name:'GPT-4o',enc:'cl100k_base',ctx:128000,vendor:'OpenAI',cat:'多模态',ctxCls:'ct-high',url:'https://chatgpt.com'},
+{name:'GPT-4o-mini',enc:'cl100k_base',ctx:128000,vendor:'OpenAI',cat:'对话',ctxCls:'ct-high',url:'https://chatgpt.com'},
+{name:'GPT-4 Turbo',enc:'cl100k_base',ctx:128000,vendor:'OpenAI',cat:'对话',ctxCls:'ct-high',url:'https://chatgpt.com'},
+{name:'GPT-4',enc:'cl100k_base',ctx:8192,vendor:'OpenAI',cat:'对话',ctxCls:'ct-low',url:'https://chatgpt.com'},
+{name:'GPT-3.5 Turbo',enc:'cl100k_base',ctx:16385,vendor:'OpenAI',cat:'对话',ctxCls:'ct-mid',url:'https://chatgpt.com'},
+{name:'text-embedding-ada-002',enc:'cl100k_base',ctx:8191,vendor:'OpenAI',cat:'嵌入',ctxCls:'ct-low',url:'https://platform.openai.com'},
+{name:'o1 (推理模型)',enc:'o200k_base',ctx:200000,vendor:'OpenAI',cat:'推理',ctxCls:'ct-high',url:'https://chatgpt.com'},
+{name:'o3-mini',enc:'o200k_base',ctx:200000,vendor:'OpenAI',cat:'推理',ctxCls:'ct-high',url:'https://chatgpt.com'},
+{name:'Sora (视频生成)',enc:'—',ctx:0,vendor:'OpenAI',cat:'视频',ctxCls:'ct-low',url:'https://sora.com'},
+{name:'Claude 3.5 Sonnet',enc:'Claude BPE',ctx:200000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Claude 3 Opus',enc:'Claude BPE',ctx:200000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Claude 3 Haiku',enc:'Claude BPE',ctx:200000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Gemini 2.5 Pro',enc:'SentencePiece',ctx:2097152,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
+{name:'Gemini 2.0 Flash',enc:'SentencePiece',ctx:1048576,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
+{name:'Gemini 1.5 Pro',enc:'SentencePiece',ctx:2097152,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
+{name:'Veo 3 (视频生成)',enc:'—',ctx:0,vendor:'Google',cat:'视频',ctxCls:'ct-low',url:'https://deepmind.google'},
+{name:'Llama 3.1 405B',enc:'Llama3 BPE',ctx:131072,vendor:'Meta',cat:'对话',ctxCls:'ct-high',url:'https://llama.meta.com'},
+{name:'Llama 3.2 多模态',enc:'Llama3 BPE',ctx:131072,vendor:'Meta',cat:'多模态',ctxCls:'ct-high',url:'https://llama.meta.com'},
+{name:'Llama 3 8B',enc:'Llama3 BPE',ctx:8192,vendor:'Meta',cat:'对话',ctxCls:'ct-low',url:'https://llama.meta.com'},
+{name:'Mistral Large',enc:'Mistral BPE',ctx:131072,vendor:'Mistral',cat:'对话',ctxCls:'ct-high',url:'https://mistral.ai'},
+{name:'Mistral Small',enc:'Mistral BPE',ctx:32768,vendor:'Mistral',cat:'对话',ctxCls:'ct-mid',url:'https://mistral.ai'},
+{name:'Cohere Command R+',enc:'Cohere BPE',ctx:131072,vendor:'Cohere',cat:'对话',ctxCls:'ct-high',url:'https://cohere.com'},
+{name:'Grok-2 (xAI)',enc:'Grok BPE',ctx:131072,vendor:'xAI',cat:'对话',ctxCls:'ct-high',url:'https://x.ai'},
+{name:'Grok-1 (xAI)',enc:'Grok BPE',ctx:8192,vendor:'xAI',cat:'对话',ctxCls:'ct-low',url:'https://x.ai'},
+{name:'DeepSeek-V3',enc:'DeepSeek BPE',ctx:65536,vendor:'深度求索',cat:'对话',ctxCls:'ct-mid',url:'https://chat.deepseek.com'},
+{name:'DeepSeek-R1',enc:'DeepSeek BPE',ctx:131072,vendor:'深度求索',cat:'推理',ctxCls:'ct-high',url:'https://chat.deepseek.com'},
+{name:'DeepSeek-Coder',enc:'DeepSeek BPE',ctx:16384,vendor:'深度求索',cat:'代码',ctxCls:'ct-mid',url:'https://chat.deepseek.com'},
+{name:'通义千问-Max',enc:'Qwen BPE',ctx:32768,vendor:'阿里云',cat:'对话',ctxCls:'ct-mid',url:'https://tongyi.aliyun.com'},
+{name:'通义千问-Plus',enc:'Qwen BPE',ctx:131072,vendor:'阿里云',cat:'对话',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
+{name:'通义千问-Long',enc:'Qwen BPE',ctx:10485760,vendor:'阿里云',cat:'对话',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
+{name:'QwQ-Max (推理)',enc:'Qwen BPE',ctx:131072,vendor:'阿里云',cat:'推理',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
+{name:'Qwen-VL (多模态)',enc:'Qwen BPE',ctx:32768,vendor:'阿里云',cat:'多模态',ctxCls:'ct-mid',url:'https://tongyi.aliyun.com'},
+{name:'通义万相 (视频)',enc:'—',ctx:0,vendor:'阿里云',cat:'视频',ctxCls:'ct-low',url:'https://tongyi.aliyun.com/wanxiang'},
+{name:'豆包 Pro-256K',enc:'Doubao BPE',ctx:262144,vendor:'字节跳动',cat:'对话',ctxCls:'ct-high',url:'https://www.doubao.com'},
+{name:'豆包 Pro-32K',enc:'Doubao BPE',ctx:32768,vendor:'字节跳动',cat:'对话',ctxCls:'ct-mid',url:'https://www.doubao.com'},
+{name:'豆包 Lite-4K',enc:'Doubao BPE',ctx:4096,vendor:'字节跳动',cat:'对话',ctxCls:'ct-low',url:'https://www.doubao.com'},
+{name:'Seedance (视频)',enc:'—',ctx:0,vendor:'字节跳动',cat:'视频',ctxCls:'ct-low',url:'https://www.doubao.com'},
+{name:'Seedream (图像)',enc:'—',ctx:0,vendor:'字节跳动',cat:'多模态',ctxCls:'ct-low',url:'https://www.doubao.com'},
+{name:'Kimi (Moonshot)',enc:'Moonshot BPE',ctx:131072,vendor:'月之暗面',cat:'对话',ctxCls:'ct-high',url:'https://kimi.moonshot.cn'},
+{name:'文心一言 4.0',enc:'ERNIE BPE',ctx:8192,vendor:'百度',cat:'对话',ctxCls:'ct-low',url:'https://yiyan.baidu.com'},
+{name:'ERNIE Speed',enc:'ERNIE BPE',ctx:131072,vendor:'百度',cat:'对话',ctxCls:'ct-high',url:'https://yiyan.baidu.com'},
+{name:'ERNIE 4.5 (推理)',enc:'ERNIE BPE',ctx:131072,vendor:'百度',cat:'推理',ctxCls:'ct-high',url:'https://yiyan.baidu.com'},
+{name:'GLM-4',enc:'GLM BPE',ctx:131072,vendor:'智谱AI',cat:'对话',ctxCls:'ct-high',url:'https://chatglm.cn'},
+{name:'GLM-4V (多模态)',enc:'GLM BPE',ctx:32768,vendor:'智谱AI',cat:'多模态',ctxCls:'ct-mid',url:'https://chatglm.cn'},
+{name:'CogVideoX (视频)',enc:'—',ctx:0,vendor:'智谱AI',cat:'视频',ctxCls:'ct-low',url:'https://chatglm.cn'},
+{name:'MiniMax-abab6.5',enc:'MiniMax BPE',ctx:245760,vendor:'MiniMax',cat:'对话',ctxCls:'ct-high',url:'https://hailuoai.com'},
+{name:'Hailuo AI (视频)',enc:'—',ctx:0,vendor:'MiniMax',cat:'视频',ctxCls:'ct-low',url:'https://hailuoai.com'},
+{name:'零一万物 Yi-Large',enc:'Yi BPE',ctx:32768,vendor:'零一万物',cat:'对话',ctxCls:'ct-mid',url:'https://platform.lingyiwanwu.com'},
+{name:'百川 4',enc:'Baichuan BPE',ctx:32768,vendor:'百川智能',cat:'对话',ctxCls:'ct-mid',url:'https://www.baichuan-ai.com'},
+{name:'阶跃星辰 Step-2',enc:'Step BPE',ctx:131072,vendor:'阶跃星辰',cat:'对话',ctxCls:'ct-high',url:'https://www.stepfun.com'},
+{name:'Step-Video (视频)',enc:'—',ctx:0,vendor:'阶跃星辰',cat:'视频',ctxCls:'ct-low',url:'https://www.stepfun.com'},
+{name:'讯飞星火 V4',enc:'Spark BPE',ctx:131072,vendor:'科大讯飞',cat:'对话',ctxCls:'ct-high',url:'https://xinghuo.xfyun.cn'},
+{name:'腾讯混元 Pro',enc:'Hunyuan BPE',ctx:32768,vendor:'腾讯',cat:'对话',ctxCls:'ct-mid',url:'https://hunyuan.tencent.com'},
+{name:'混元 Video (视频)',enc:'—',ctx:0,vendor:'腾讯',cat:'视频',ctxCls:'ct-low',url:'https://hunyuan.tencent.com'},
+{name:'商汤 日日新 5.0',enc:'SenseNova BPE',ctx:131072,vendor:'商汤科技',cat:'对话',ctxCls:'ct-high',url:'https://platform.sensenova.cn'},
+{name:'Kimi K2 (推理)',enc:'Moonshot BPE',ctx:131072,vendor:'月之暗面',cat:'推理',ctxCls:'ct-high',url:'https://kimi.moonshot.cn'},
+{name:'DALL·E 3 (图像)',enc:'—',ctx:0,vendor:'OpenAI',cat:'多模态',ctxCls:'ct-low',url:'https://chatgpt.com'},
+{name:'Midjourney V6 (图像)',enc:'—',ctx:0,vendor:'Midjourney',cat:'多模态',ctxCls:'ct-low',url:'https://midjourney.com'},
+{name:'Stable Diffusion 3',enc:'—',ctx:0,vendor:'StabilityAI',cat:'多模态',ctxCls:'ct-low',url:'https://stability.ai'},
+{name:'Suno V4 (音乐)',enc:'—',ctx:0,vendor:'Suno',cat:'多模态',ctxCls:'ct-low',url:'https://suno.com'},
+{name:'Udio (音乐)',enc:'—',ctx:0,vendor:'Udio',cat:'多模态',ctxCls:'ct-low',url:'https://udio.com'},
+{name:'可灵 Kling (视频)',enc:'—',ctx:0,vendor:'快手',cat:'视频',ctxCls:'ct-low',url:'https://kling.kuaishou.com'},
+{name:'即梦 Jimeng (视频)',enc:'—',ctx:0,vendor:'字节跳动',cat:'视频',ctxCls:'ct-low',url:'https://jimeng.jianying.com'},
+{name:'Pika 2.0 (视频)',enc:'—',ctx:0,vendor:'Pika Labs',cat:'视频',ctxCls:'ct-low',url:'https://pika.art'},
+{name:'Runway Gen-4 (视频)',enc:'—',ctx:0,vendor:'Runway',cat:'视频',ctxCls:'ct-low',url:'https://runwayml.com'},
+];
+
+let tokenData=[], activeTokenIdx=-1, providers=[...DEFAULT_PROVIDERS];
+let useRealTokenizer=false, realEncode=null, realDecode=null;
+let currentCtx=128000, currentEnc='cl100k_base';
+let encodingCache={}; // cache loaded gpt-tokenizer encodings
+
+// Encoding → gpt-tokenizer module path mapping
+const ENCODING_IMPORT = {
+'cl100k_base':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/cl100k_base.js',
+'p50k_base':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/p50k_base.js',
+'p50k_edit':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/p50k_edit.js',
+'r50k_base':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/r50k_base.js',
+};
+
+// Estimation ratios: chars-per-token for different encoding families
+const ENCODING_RATIO = {
+'cl100k_base':{en:0.25,cn:1.6}, // GPT-4/3.5 standard
+'p50k_base':{en:0.28,cn:1.8},   // GPT-3 era, slightly less efficient
+'p50k_edit':{en:0.28,cn:1.8},
+'r50k_base':{en:0.30,cn:2.2},   // Even older
+'claude':{en:0.24,cn:1.5},      // Claude: slightly more efficient
+'sentencepiece':{en:0.22,cn:1.4},// Gemini: SentencePiece efficient
+'llama3':{en:0.26,cn:1.7},      // Llama3 BPE
+'mistral':{en:0.26,cn:1.7},     // Mistral
+'qwen':{en:0.25,cn:1.5},        // Qwen: efficient for Chinese
+'doubao':{en:0.26,cn:1.5},      // Doubao: efficient for Chinese
+'moonshot':{en:0.25,cn:1.6},    // Moonshot
+'deepseek':{en:0.25,cn:1.6},    // DeepSeek
+'ernie':{en:0.26,cn:1.5},       // ERNIE: good for Chinese
+'glm':{en:0.26,cn:1.5},         // GLM
+'hunyuan':{en:0.25,cn:1.6},     // Hunyuan
+'baichuan':{en:0.26,cn:1.7},
+'yi':{en:0.26,cn:1.7},
+'step':{en:0.25,cn:1.6},
+'minimax':{en:0.25,cn:1.6},
+'spark':{en:0.25,cn:1.6},
+'cohere':{en:0.26,cn:1.8},
+'grok':{en:0.27,cn:1.8},
+'sensenova':{en:0.25,cn:1.6},
+};
+
+// ═══════════════════════════════════════
+//  TOKEN ESTIMATOR (instant fallback, encoding-aware)
+// ═══════════════════════════════════════
+function estimateTokens(text) {
+const cn=(text.match(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g)||[]).length;
+// Encoding-aware ratio: different tokenizers have different efficiencies
+const key=currentEnc.toLowerCase();
+let ratio=ENCODING_RATIO[key]||ENCODING_RATIO['cl100k_base'];
+// Shorter enc name matching (e.g., "Claude BPE" → "claude")
+if(!ENCODING_RATIO[key]){
+for(const[k,v]of Object.entries(ENCODING_RATIO)){if(key.includes(k)){ratio=v;break;}}
+}
+return Math.max(1,Math.round(cn*ratio.cn + (text.length-cn)*ratio.en));
+}
+function estimateTokenData(text){
+const chunks=[],cnRe=/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/;
+let i=0;
+while(i<text.length){
+const ch=text[i];
+if(ch===' '||ch==='\n'){chunks.push({text:ch,id:-1});i++}
+else if(cnRe.test(ch)){chunks.push({text:ch,id:-1});i++}
+else{let j=i;while(j<text.length&&!cnRe.test(text[j])&&text[j]!==' '&&text[j]!=='\n')j++;
+const g=text.slice(i,j);for(let k=0;k<g.length;k+=4)chunks.push({text:g.slice(k,k+4),id:-1});i=j;}
+}
+return chunks.map((c,idx)=>({id:c.id,text:c.text,colorIdx:idx%PALETTE.length,isSpace:c.text.trim()===''&&c.text!=='',isNewline:c.text.includes('\n')}));
+}
+
+// ═══════════════════════════════════════
+//  UPDATE PIPELINE
+// ═══════════════════════════════════════
+function update(){
+const text=document.getElementById('textInput').value,bar=document.getElementById('detailBar');
+if(!text.trim()){tokenData=[];activeTokenIdx=-1;bar.style.display='none';updateStats(text,0);renderTokens();updateAll();return;}
+if(useRealTokenizer&&realEncode&&realDecode){try{
+const ids=realEncode(text),txts=ids.map(id=>{try{return realDecode([id])}catch(e){return'[?]'}});
+tokenData=ids.map((id,i)=>({id,text:txts[i],colorIdx:i%PALETTE.length,isSpace:txts[i].trim()===''&&txts[i]!=='',isNewline:txts[i].includes('\n')}));
+updateStats(text,ids.length);renderTokens();updateAll();return;
+}catch(e){useRealTokenizer=false;}}
+tokenData=estimateTokenData(text);updateStats(text,estimateTokens(text));renderTokens();updateAll();
+}
+function updateStats(text,tc){
+const cn=(text.match(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g)||[]).length;
+const b=new TextEncoder().encode(text).length,ln=text?(text.match(/\n/g)||[]).length+1:0;
+const o=parseInt(document.getElementById('outputTokens').value)||0;
+document.getElementById('tokenCount').textContent=tc.toLocaleString();
+document.getElementById('uniqueCount').textContent=tc>0?'估算中':'0';
+document.getElementById('avgRatio').textContent=tc>0?(text.length/tc).toFixed(1):'0';
+document.getElementById('spaceCount').textContent=tokenData.filter(t=>t.isSpace).length.toLocaleString();
+document.getElementById('totalWithOutput').textContent=(tc+o).toLocaleString();
+document.getElementById('charCount').textContent=text.length.toLocaleString();
+document.getElementById('byteCount').textContent=b.toLocaleString();
+document.getElementById('lineCount').textContent=ln.toLocaleString();
+document.getElementById('cnCharCount').textContent=cn.toLocaleString();
+document.getElementById('inputTokenCount').textContent=tc.toLocaleString();
+document.getElementById('wordsEst').textContent=Math.round(tc/1.3).toLocaleString();
+// Context window usage
+const pct=currentCtx>0?Math.min(100,Math.round(tc/currentCtx*100)):0;
+const badge=document.getElementById('ctxUsage');
+badge.textContent=pct+'%';
+badge.className='ctx-badge '+(pct>80?'warn':'ok');
+document.getElementById('ctxWindow').textContent=currentCtx.toLocaleString();
+}
+function updateAll(){renderComparison();}
+
+// ═══════════════════════════════════════
+//  RENDERING
+// ═══════════════════════════════════════
+function renderTokens(){
+const viz=document.getElementById('tokenViz');
+if(!tokenData.length){viz.innerHTML='<div class="no-tokens">👆 在上方输入文本，查看实时分词效果</div>';return;}
+let h='<div class="tokens-row">';
+tokenData.forEach((td,i)=>{
+const p=PALETTE[td.colorIdx];
+let d=esc(td.text);d=d.replace(/ /g,'<span class="vis-space">␣</span>');d=d.replace(/\n/g,'<span class="vis-newline">↵<br></span>');if(d==='')d='·';
+h+=`<span class="token-chunk${i===activeTokenIdx?' active':''}" style="background:${p.bg};border:1px solid ${p.bd}" data-idx="${i}" onmouseenter="app.hoverToken(${i})" onclick="app.clickToken(${i})">${d}</span>`;
+});
+h+='</div>';viz.innerHTML=h;
+}
+function renderComparison(){
+const tbody=document.getElementById('cmpBody'),text=document.getElementById('textInput').value;
+const nIn=(useRealTokenizer&&realEncode)?realEncode(text).length:estimateTokens(text);
+const nOut=parseInt(document.getElementById('outputTokens').value)||0;
+let bestT=Infinity,bestId=null;
+providers.forEach(p=>{const t=(nIn/1e6)*p.input+(nOut/1e6)*p.output;if(t<bestT){bestT=t;bestId=p.id;}});
+let h='';
+providers.forEach(p=>{
+const inC=(nIn/1e6)*p.input,outC=(nOut/1e6)*p.output,totC=inC+outC;
+h+=`<tr class="${p.id===bestId&&totC>0?'best':''}">`;
+h+=`<td><span class="provider-name">${esc(p.name)}</span><span class="provider-sub">${esc(p.desc||'')}</span></td>`;
+h+=`<td style="color:#8b949e;font-size:.63rem">${p.curr}${p.input.toFixed(2)}</td>`;
+h+=`<td style="color:#8b949e;font-size:.63rem">${p.curr}${p.output.toFixed(2)}</td>`;
+h+=`<td><span class="cost-val cost-inp">${p.curr}${inC.toFixed(4)}</span></td>`;
+h+=`<td><span class="cost-val cost-out">${p.curr}${outC.toFixed(4)}</span></td>`;
+h+=`<td><span class="cost-val cost-tot">${p.curr}${totC.toFixed(4)}</span></td></tr>`;
+});
+tbody.innerHTML=h;
+}
+function renderEncTable(){
+const tbody=document.getElementById('encBody');
+let h='';
+ALL_MODELS.forEach(m=>{
+const catColor={'对话':'#58a6ff','多模态':'#a371f7','推理':'#f778ba','代码':'#3fb950','视频':'#f0a040','嵌入':'#8b949e'};
+const ctxDisplay=m.ctx>0?m.ctx.toLocaleString():'—';
+h+=`<tr><td class="enc-name" title="${esc(m.url||'')}">${esc(m.name)}</td>`;
+h+=`<td><span style="font-size:.6rem;color:${catColor[m.cat]||'#8b949e'};background:${catColor[m.cat]||'#8b949e'}15;padding:1px 5px;border-radius:3px">${esc(m.cat)}</span></td>`;
+h+=`<td class="enc-sub">${esc(m.enc)}</td>`;
+h+=`<td><span class="ctx-tag ${m.ctxCls}">${ctxDisplay}</span></td>`;
+h+=`<td class="enc-sub">${esc(m.vendor)}</td></tr>`;
+});
+tbody.innerHTML=h;
+}
+
+// ═══════════════════════════════════════
+//  APP METHODS
+// ═══════════════════════════════════════
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+window.app={
+switchTab(name){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('on'));
+event.target.classList.add('on');
+document.getElementById('tab-'+name).classList.add('on');
+if(name==='kmcalc') this.calcKM();
+if(name==='models'&&!document.getElementById('encBody').innerHTML) renderEncTable();
+},
+hoverToken(idx){const bar=document.getElementById('detailBar'),td=tokenData[idx];if(!td)return;
+document.getElementById('detailToken').textContent=esc(td.text)||'(空白)';
+document.getElementById('detailId').textContent=td.id>=0?td.id:'估算';
+document.getElementById('detailPos').textContent='#'+(idx+1)+'/'+tokenData.length;
+document.getElementById('detailBytes').textContent=new TextEncoder().encode(td.text).length;
+bar.style.display='flex';},
+clickToken(idx){activeTokenIdx=(activeTokenIdx===idx)?-1:idx;
+if(activeTokenIdx>=0)this.hoverToken(activeTokenIdx);else document.getElementById('detailBar').style.display='none';renderTokens();},
+clear(){document.getElementById('textInput').value='';update();document.getElementById('textInput').focus();},
+copyTokens(){if(!tokenData.length)return;navigator.clipboard.writeText(tokenData.map(t=>t.text).join(' · '));},
+copyIds(){if(!tokenData.length)return;const ids=tokenData.map(t=>t.id).filter(id=>id>=0);navigator.clipboard.writeText(ids.join(', ')||'（估算模式）');},
+onModelChange(){
+const sel=document.getElementById('modelSelect');
+const opt=sel.options[sel.selectedIndex];
+currentCtx=parseInt(opt.getAttribute('data-ctx'))||128000;
+currentEnc=opt.getAttribute('data-enc')||'cl100k_base';
+// Update badge
+const badge=document.getElementById('tokenizerBadge');
+badge.textContent=currentEnc;
+// Try to load encoding-specific tokenizer
+if(ENCODING_IMPORT[currentEnc]&&!encodingCache[currentEnc]){
+badge.textContent='加载中…';
+badge.className='tokenizer-badge est';
+import(ENCODING_IMPORT[currentEnc]).then(mod=>{
+encodingCache[currentEnc]={encode:mod.encode||mod.default.encode,decode:mod.decode||mod.default.decode};
+useRealTokenizer=true;realEncode=encodingCache[currentEnc].encode;realDecode=encodingCache[currentEnc].decode;
+badge.textContent=currentEnc;badge.className='tokenizer-badge real';
+update();
+}).catch(()=>{
+badge.textContent=currentEnc+'*';badge.className='tokenizer-badge est';
+update();
+});
+}else if(encodingCache[currentEnc]){
+useRealTokenizer=true;realEncode=encodingCache[currentEnc].encode;realDecode=encodingCache[currentEnc].decode;
+badge.className='tokenizer-badge real';
+update();
+}else{
+// No exact tokenizer available, use estimation
+useRealTokenizer=false;
+badge.className='tokenizer-badge est';
+update();
+}
+// Visual feedback
+const ctxEl=document.getElementById('ctxWindow');
+ctxEl.style.transition='color .15s';ctxEl.style.color='#f778ba';
+setTimeout(()=>ctxEl.style.color='#58a6ff',300);
+const ctxBadge=document.getElementById('ctxUsage');
+ctxBadge.style.transition='transform .2s';ctxBadge.style.transform='scale(1.3)';
+setTimeout(()=>ctxBadge.style.transform='scale(1)',200);
+},
+calcImage(){
+const w=parseInt(document.getElementById('imgWidth').value)||0,h=parseInt(document.getElementById('imgHeight').value)||0;
+const q=document.getElementById('imgQuality').value,cnt=parseInt(document.getElementById('imgCount').value)||1;
+if(w<=0||h<=0){document.getElementById('imgTokens').textContent='0';return;}
+let perImg=0,detail='';
+if(q==='low'){perImg=85;detail=cnt+' 张 × 低分辨率 = 85 tokens/张';}
+else if(q==='auto'){perImg=(Math.min(w,h)<=512&&Math.max(w,h)<=768)?85:(85+170*Math.ceil(w/512)*Math.ceil(h/512));detail=cnt+' 张 '+w+'×'+h+' (auto) = '+perImg+' tokens/张';}
+else{const tiles=Math.ceil(w/512)*Math.ceil(h/512);perImg=85+170*tiles;detail=cnt+' 张 '+w+'×'+h+' ≈ '+perImg+' tokens/张（'+Math.ceil(w/512)+'×'+Math.ceil(h/512)+' tiles × 170 + 85 base）';}
+document.getElementById('imgTokens').textContent=(perImg*cnt).toLocaleString();
+document.getElementById('imgDetailRow').textContent=detail;
+},
+// ── Image upload ──
+handleImageUpload(evt){
+const file=evt.target.files[0];if(!file)return;
+this.loadImageFile(file);
+},
+handleImageDrop(evt){
+const file=evt.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+this.loadImageFile(file);
+},
+loadImageFile(file){
+const reader=new FileReader();
+reader.onload=function(e){
+const img=new Image();
+img.onload=function(){
+document.getElementById('imgWidth').value=img.naturalWidth;
+document.getElementById('imgHeight').value=img.naturalHeight;
+document.getElementById('imgPreview').style.display='block';
+document.getElementById('imgPreviewImg').src=e.target.result;
+document.getElementById('imgPreviewInfo').textContent=img.naturalWidth+' × '+img.naturalHeight+' px · '+(file.size/1024).toFixed(1)+' KB';
+app.calcImage();
+};
+img.src=e.target.result;
+};
+reader.readAsDataURL(file);
+},
+clearImage(){
+document.getElementById('imgPreview').style.display='none';
+document.getElementById('imgFileInput').value='';
+document.getElementById('imgWidth').value=1024;
+document.getElementById('imgHeight').value=1024;
+this.calcImage();
+},
+addCustom(){
+const name=document.getElementById('custName').value.trim();
+const inp=parseFloat(document.getElementById('custInputPrice').value);
+const out=parseFloat(document.getElementById('custOutputPrice').value);
+const curr=document.getElementById('custCurrency').value;
+if(!name||isNaN(inp)||isNaN(out)||inp<0||out<0){alert('请填写完整信息');return;}
+const id='cust_'+Date.now();
+const existing=providers.filter(p=>p.id.startsWith('cust_'));
+existing.push({id,name,desc:'自定义',input:inp,output:out,curr});
+providers=[...DEFAULT_PROVIDERS,...existing];
+localStorage.setItem('tokenCalcCustomProviders',JSON.stringify(existing));
+renderComparison();renderCustomList();
+document.getElementById('custName').value='';document.getElementById('custInputPrice').value='';document.getElementById('custOutputPrice').value='';
+const tip=document.getElementById('savedTip');tip.style.display='block';setTimeout(()=>tip.style.display='none',1500);
+},
+removeCustom(id){
+const existing=providers.filter(p=>p.id.startsWith('cust_')&&p.id!==id);
+providers=[...DEFAULT_PROVIDERS,...existing];
+localStorage.setItem('tokenCalcCustomProviders',JSON.stringify(existing));
+renderComparison();renderCustomList();
+},
+
+// ── K/M Calculator (AI decimal convention) ──
+calcKM(){
+const raw=document.getElementById('kmInput').value.trim();
+let val=0,numericPart='',originalUnit='';
+// Parse: "128K"→128000, "1.5M"→1500000, "5万"→50000, "1亿"→100000000, "1千万"→10000000
+const match=raw.match(/^([\d.,]+)\s*(K|M|千|万|十万|百万|千万|亿|十亿|百亿|千亿)?$/i);
+if(match){
+numericPart=match[1].replace(/,/g,'');
+val=parseFloat(numericPart);
+if(isNaN(val))val=0;
+originalUnit=(match[2]||'').toUpperCase();
+if(originalUnit==='K'||originalUnit==='千')val*=1000;
+else if(originalUnit==='M')val*=1000000;
+else if(originalUnit==='万')val*=10000;
+else if(originalUnit==='十万')val*=100000;
+else if(originalUnit==='百万')val*=1000000;
+else if(originalUnit==='千万')val*=10000000;
+else if(originalUnit==='亿')val*=100000000;
+else if(originalUnit==='十亿')val*=1000000000;
+else if(originalUnit==='百亿')val*=10000000000;
+else if(originalUnit==='千亿')val*=100000000000;
+}
+// AI decimal display
+document.getElementById('kmAI').textContent=val.toLocaleString();
+// Chinese unit display
+let cnDisplay='';
+if(val>=1e8)cnDisplay=(val/1e8).toFixed(val%1e8===0?0:2)+'亿';
+else if(val>=1e4)cnDisplay=(val/1e4).toFixed(val%1e4===0?0:2)+'万';
+else if(val>=1e3)cnDisplay=(val/1e3).toFixed(val%1e3===0?0:2)+'千';
+else cnDisplay=val.toLocaleString();
+document.getElementById('kmCN').textContent=cnDisplay;
+// Binary equivalent
+document.getElementById('kmCS').textContent=val<1024?(val+' B'):(val<1048576?(val/1024).toFixed(1)+' KiB':((val/1048576).toFixed(2)+' MiB'));
+// Note
+const note=document.getElementById('kmNote');
+if(val===1000)note.innerHTML='✅ <strong>1K Token = 1,000</strong>（正确！AI 使用十进制）<br>❌ 不是 1,024（计算机存储 KB）';
+else if(val===10000)note.innerHTML='✅ <strong>1万 Token = 10,000</strong>（正确！AI 行业十进制）<br>= <strong>10K</strong>（10×1,000）';
+else if(val===1000000)note.innerHTML='✅ <strong>1M Token = 100万 = 1,000,000</strong>（正确！）<br>❌ 不是 1,048,576（计算机存储 MB）';
+else if(val===100000000)note.innerHTML='✅ <strong>1亿 Token = 100,000,000</strong>（正确！AI 十进制）<br>= <strong>100M</strong>（100×1,000,000）';
+else note.innerHTML='⚠️ AI 行业 Token：K=<strong>千(1e3)</strong> M=<strong>百万(1e6)</strong> 万=<strong>1e4</strong> 亿=<strong>1e8</strong><br>与计算机存储（KB=1024）<strong>完全不同</strong>！';
+// Context window checker
+this.renderCtxCheck(val);
+},
+presetKM(v){
+document.getElementById('kmInput').value=v;
+this.calcKM();
+},
+renderCtxCheck(tokenCount){
+const container=document.getElementById('ctxChecker');
+if(!tokenCount||tokenCount<1){container.innerHTML='';return;}
+// Find relevant context windows
+const relevant=ALL_MODELS.filter(m=>m.ctx>=tokenCount*0.5).sort((a,b)=>a.ctx-b.ctx).slice(0,5);
+if(!relevant.length){container.innerHTML='';return;}
+// Use first model as reference
+const ref=relevant[0];
+const pct=Math.min(100,Math.round(tokenCount/ref.ctx*100));
+const cls=pct>80?'danger':(pct>50?'warning':'');
+let h=`<div class="ctx-title">📏 上下文窗口占用估算（以 ${esc(ref.name)} ${ref.ctx.toLocaleString()} 为例）</div>`;
+h+=`<div class="ctx-bar-outer"><div class="ctx-bar-inner ${cls}" style="width:${pct}%"></div></div>`;
+h+=`<div class="ctx-info"><span>${tokenCount.toLocaleString()} tokens</span><span>${ref.ctx.toLocaleString()} tokens</span></div>`;
+// List other models
+h+=`<div style="margin-top:6px;font-size:.58rem;color:#8b949e;">该数量适合的上下文窗口：</div>`;
+relevant.forEach(m=>{const p=Math.round(tokenCount/m.ctx*100);h+=`<div style="font-size:.58rem;padding:2px 0;color:${p>80?'#f85149':'#8b949e'}">${esc(m.name)}：${m.ctx.toLocaleString()}（占用 ${p}%）</div>`;});
+container.innerHTML=h;
+},
+
+// ── Converter with K/M support ──
+convert(){
+const raw=document.getElementById('convInput').value.trim();
+const f=document.getElementById('convFrom').value,t=document.getElementById('convTo').value;
+// Parse K/M notation
+let v=0;
+const m=raw.match(/^([\d.,]+)\s*(K|M|千|万)?$/);
+if(m){v=parseFloat(m[1].replace(/,/g,''))||0;const u=m[2];if(u==='K'||u==='千')v*=1000;else if(u==='M')v*=1000000;else if(u==='万')v*=10000;}
+else v=parseFloat(raw)||0;
+const TO_TOKEN={token:1,char:0.25,word:1.3,cn_char:1.8,kb:250,page:900};
+const result=(v*TO_TOKEN[f])/TO_TOKEN[t];
+document.getElementById('convResult').value=Number.isInteger(result)?result.toLocaleString():result.toFixed(2);
+},
+// ── Panel drag ──
+startDrag(e){
+e.preventDefault();
+app._dragging=true;
+app._startX=e.clientX;
+app._startW=document.getElementById('panelRight').offsetWidth;
+document.getElementById('panelDivider').classList.add('dragging');
+document.body.style.cursor='col-resize';
+document.body.style.userSelect='none';
+},
+};
+
+// ── Global drag handlers ──
+app._dragging=false;
+document.addEventListener('mousemove',function(e){
+if(!app._dragging)return;
+const dx=e.clientX-app._startX;
+const newW=Math.max(260,Math.min(window.innerWidth*0.7,app._startW-dx));
+document.getElementById('panelRight').style.width=newW+'px';
+});
+document.addEventListener('mouseup',function(){
+if(!app._dragging)return;
+app._dragging=false;
+document.getElementById('panelDivider').classList.remove('dragging');
+document.body.style.cursor='';
+document.body.style.userSelect='';
+});
+
+function renderCustomList(){
+const list=document.getElementById('savedList');
+const custom=providers.filter(p=>p.id.startsWith('cust_'));
+if(!custom.length){list.innerHTML='';return;}
+let h='';custom.forEach(p=>{h+=`<div class="saved-item"><span><span class="si-name">${esc(p.name)}</span> <span class="si-price">${p.curr}${p.input.toFixed(4)}/${p.curr}${p.output.toFixed(4)}</span></span><button onclick="app.removeCustom('${p.id}')">✕</button></div>`;});
+list.innerHTML=h;
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+function init(){
+try{const s=JSON.parse(localStorage.getItem('tokenCalcCustomProviders')||'[]');providers=[...DEFAULT_PROVIDERS,...s];}catch(e){}
+// Bind model change event
+document.getElementById('modelSelect').addEventListener('change',function(){app.onModelChange();});
+const sample=`The quick brown fox 🦊 jumps over the lazy dog.
+
+AI Token 计算器 Pro：
+• 50+ 模型编码速查 🧬
+• 1K=1000 十进制换算 🔢
+• 12+ 服务商价格对比 📊
+• 上下文窗口占用检查 📏
+
+Token 是 AI 模型计费的核心单位 — 1K=1,000，1M=1,000,000。`;
+document.getElementById('textInput').value=sample;
+update();app.calcImage();app.calcKM();renderCustomList();
+}
+init();
+
+// Progressive enhancement: load default tokenizer
+(async function(){
+try{
+const mod=await import('https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/main.js');
+encodingCache['cl100k_base']={encode:mod.encode,decode:mod.decode};
+realEncode=mod.encode;realDecode=mod.decode;useRealTokenizer=true;
+const badge=document.getElementById('tokenizerBadge');
+badge.textContent='cl100k_base';badge.className='tokenizer-badge real';
+update();
+}catch(e){}
+})();
+</script>
+</body>
+</html>
