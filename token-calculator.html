@@ -172,78 +172,87 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#0d1117;color:#c9
 <div class="panel panel-left">
 <div class="toolbar">
 <label>编码模型：</label>
+<!-- 模型选择下拉框（硬编码，非自动派生）
+     每个 option：value=模型ID；data-ctx=上下文窗口(token 数)；data-enc=编码家族（决定分词器/估算系数）
+     数据版本 2026.09，与 global-ai-models.json 对齐 -->
 <select id="modelSelect">
 <optgroup label="🌍 OpenAI">
+<option value="gpt-6-astra" data-ctx="1000000" data-enc="o200k_base">GPT-6 Astra — ~1M（估算）</option>
+<option value="gpt-5.6-sol" data-ctx="1050000" data-enc="o200k_base">GPT-5.6 Sol — 1.05M（促销）</option>
+<option value="gpt-5.6-terra" data-ctx="1050000" data-enc="o200k_base">GPT-5.6 Terra — 1.05M</option>
+<option value="gpt-5.6-luna" data-ctx="1050000" data-enc="o200k_base">GPT-5.6 Luna — 1.05M</option>
 <option value="gpt-4o" data-ctx="128000" data-enc="cl100k_base">GPT-4o — 128K</option>
 <option value="gpt-4o-mini" data-ctx="128000" data-enc="cl100k_base">GPT-4o-mini — 128K</option>
-<option value="gpt-4-turbo" data-ctx="128000" data-enc="cl100k_base">GPT-4 Turbo — 128K</option>
-<option value="gpt-4" data-ctx="8192" data-enc="cl100k_base">GPT-4 — 8K</option>
-<option value="gpt-4-32k" data-ctx="32768" data-enc="cl100k_base">GPT-4 32K</option>
 <option value="gpt-3.5-turbo" data-ctx="16385" data-enc="cl100k_base">GPT-3.5 Turbo — 16K</option>
-<option value="text-davinci-003" data-ctx="4097" data-enc="p50k_base">GPT-3 Davinci — 4K</option>
-<option value="text-embedding-ada-002" data-ctx="8191" data-enc="cl100k_base">Embedding Ada-002 — 8K</option>
 </optgroup>
 <optgroup label="🌍 Anthropic">
-<option value="claude-3.5-sonnet" data-ctx="200000" data-enc="claude">Claude 3.5 Sonnet — 200K</option>
-<option value="claude-3-opus" data-ctx="200000" data-enc="claude">Claude 3 Opus — 200K</option>
-<option value="claude-3-haiku" data-ctx="200000" data-enc="claude">Claude 3 Haiku — 200K</option>
+<option value="claude-fable-5.1" data-ctx="1000000" data-enc="claude">Claude Fable 5.1 — 1M</option>
+<option value="claude-mythos-5.1" data-ctx="1000000" data-enc="claude">Claude Mythos 5.1 — 1M（限量）</option>
+<option value="claude-fable-5" data-ctx="1000000" data-enc="claude">Claude Fable 5 — 1M</option>
+<option value="claude-opus-5" data-ctx="1000000" data-enc="claude">Claude Opus 5 — 1M</option>
+<option value="claude-opus-4.8" data-ctx="200000" data-enc="claude">Claude Opus 4.8 — 200K</option>
+<option value="claude-sonnet-5" data-ctx="1000000" data-enc="claude">Claude Sonnet 5 — 1M（永久价）</option>
+<option value="claude-sonnet-4.6" data-ctx="200000" data-enc="claude">Claude Sonnet 4.6 — 200K</option>
+<option value="claude-haiku-4.5" data-ctx="200000" data-enc="claude">Claude Haiku 4.5 — 200K</option>
 </optgroup>
 <optgroup label="🌍 Google">
-<option value="gemini-1.5-pro" data-ctx="2097152" data-enc="sentencepiece">Gemini 1.5 Pro — 2M</option>
-<option value="gemini-1.5-flash" data-ctx="1048576" data-enc="sentencepiece">Gemini 1.5 Flash — 1M</option>
-<option value="gemini-2.0-flash" data-ctx="1048576" data-enc="sentencepiece">Gemini 2.0 Flash — 1M</option>
+<option value="gemini-3.8-flash" data-ctx="1048576" data-enc="sentencepiece">Gemini 3.8 Flash — 1M（促销）</option>
+<option value="gemini-3.5-flash" data-ctx="1048576" data-enc="sentencepiece">Gemini 3.5 Flash — 1M</option>
+<option value="gemini-3.1-pro" data-ctx="1048576" data-enc="sentencepiece">Gemini 3.1 Pro — 1M</option>
+<option value="gemini-3.1-flash-lite" data-ctx="1048576" data-enc="sentencepiece">Gemini 3.1 Flash-Lite — 1M</option>
 </optgroup>
-<optgroup label="🌍 Meta">
+<optgroup label="🌍 xAI">
+<option value="grok-4.6" data-ctx="500000" data-enc="grok">Grok 4.6 — 500K</option>
+<option value="grok-4.5" data-ctx="500000" data-enc="grok">Grok 4.5 — 500K</option>
+<option value="grok-4.3" data-ctx="1000000" data-enc="grok">Grok 4.3 — 1M</option>
+<option value="grok-4.20" data-ctx="1000000" data-enc="grok">Grok 4.20 — 1M</option>
+</optgroup>
+<optgroup label="🌍 Meta / Mistral">
 <option value="llama-3.1-405b" data-ctx="131072" data-enc="llama3">Llama 3.1 405B — 128K</option>
-<option value="llama-3.1-70b" data-ctx="131072" data-enc="llama3">Llama 3.1 70B — 128K</option>
-<option value="llama-3-8b" data-ctx="8192" data-enc="llama3">Llama 3 8B — 8K</option>
-</optgroup>
-<optgroup label="🌍 Mistral">
 <option value="mistral-large" data-ctx="131072" data-enc="mistral">Mistral Large — 128K</option>
-<option value="mistral-small" data-ctx="32768" data-enc="mistral">Mistral Small — 32K</option>
-</optgroup>
-<optgroup label="🌍 其他国际">
-<option value="cohere-command-r" data-ctx="131072" data-enc="cohere">Cohere Command R+ — 128K</option>
-<option value="grok-1" data-ctx="8192" data-enc="grok">Grok-1 (xAI) — 8K</option>
 </optgroup>
 <optgroup label="🇨🇳 深度求索">
-<option value="deepseek-v3" data-ctx="65536" data-enc="deepseek">DeepSeek-V3 — 64K</option>
+<option value="deepseek-flash" data-ctx="1048576" data-enc="deepseek">DeepSeek V4.1-Flash — 1M（闲时）</option>
+<option value="deepseek-v4-pro" data-ctx="131072" data-enc="deepseek">DeepSeek V4-Pro-0813 — 128K（闲时）</option>
 <option value="deepseek-r1" data-ctx="131072" data-enc="deepseek">DeepSeek-R1 — 128K</option>
-<option value="deepseek-coder" data-ctx="16384" data-enc="deepseek">DeepSeek-Coder — 16K</option>
 </optgroup>
 <optgroup label="🇨🇳 阿里云">
+<option value="qwen3.8-max" data-ctx="1048576" data-enc="qwen">通义千问 Qwen3.8-Max — 1M</option>
+<option value="qwen3.7-max" data-ctx="1048576" data-enc="qwen">通义千问 Qwen3.7-Max — 1M</option>
 <option value="qwen-max" data-ctx="32768" data-enc="qwen">通义千问-Max — 32K</option>
 <option value="qwen-plus" data-ctx="131072" data-enc="qwen">通义千问-Plus — 128K</option>
 <option value="qwen-turbo" data-ctx="8192" data-enc="qwen">通义千问-Turbo — 8K</option>
 <option value="qwen-long" data-ctx="10485760" data-enc="qwen">通义千问-Long — 10M</option>
 </optgroup>
 <optgroup label="🇨🇳 字节跳动">
-<option value="doubao-pro-256k" data-ctx="262144" data-enc="doubao">豆包 Pro — 256K</option>
-<option value="doubao-pro-32k" data-ctx="32768" data-enc="doubao">豆包 Pro — 32K</option>
-<option value="doubao-lite" data-ctx="4096" data-enc="doubao">豆包 Lite — 4K</option>
+<option value="seed-2.1-pro" data-ctx="262144" data-enc="doubao">豆包 Seed 2.1 Pro — 256K</option>
+<option value="seed-2.1-turbo" data-ctx="262144" data-enc="doubao">豆包 Seed 2.1 Turbo — 256K</option>
+<option value="seed-2.0-pro" data-ctx="262144" data-enc="doubao">豆包 Seed 2.0 Pro — 256K</option>
+<option value="seed-2.0-mini" data-ctx="131072" data-enc="doubao">豆包 Seed 2.0 Mini — 128K</option>
+<option value="doubao-1.6-flash" data-ctx="131072" data-enc="doubao">豆包 1.6 Flash — 128K</option>
 </optgroup>
 <optgroup label="🇨🇳 月之暗面">
-<option value="moonshot-v1-128k" data-ctx="131072" data-enc="moonshot">Kimi (Moonshot) — 128K</option>
-<option value="moonshot-v1-32k" data-ctx="32768" data-enc="moonshot">Kimi (Moonshot) — 32K</option>
-<option value="moonshot-v1-8k" data-ctx="8192" data-enc="moonshot">Kimi (Moonshot) — 8K</option>
+<option value="kimi-k3" data-ctx="1048576" data-enc="moonshot">Kimi K3 — 1M</option>
+<option value="kimi-k2.8-preview" data-ctx="1048576" data-enc="moonshot">Kimi K2.8 Preview — 1M</option>
+<option value="kimi-k2.7-code" data-ctx="262144" data-enc="moonshot">Kimi K2.7 Code — 256K</option>
 </optgroup>
 <optgroup label="🇨🇳 百度">
-<option value="ernie-4.0" data-ctx="8192" data-enc="ernie">文心一言 4.0 — 8K</option>
-<option value="ernie-3.5" data-ctx="4096" data-enc="ernie">文心一言 3.5 — 4K</option>
-<option value="ernie-speed" data-ctx="131072" data-enc="ernie">ERNIE Speed — 128K</option>
+<option value="ernie-5.1" data-ctx="131072" data-enc="ernie">文心一言 ERNIE 5.1 — 128K</option>
+<option value="ernie-speed" data-ctx="131072" data-enc="ernie">ERNIE Speed — 128K（免费）</option>
 </optgroup>
 <optgroup label="🇨🇳 智谱 AI">
-<option value="glm-4" data-ctx="131072" data-enc="glm">GLM-4 — 128K</option>
-<option value="glm-4-plus" data-ctx="131072" data-enc="glm">GLM-4 Plus — 128K</option>
-<option value="glm-3-turbo" data-ctx="32768" data-enc="glm">GLM-3 Turbo — 32K</option>
+<option value="glm-5.3" data-ctx="1048576" data-enc="glm">GLM-5.3 — 1M</option>
+<option value="glm-5.3-flash" data-ctx="1048576" data-enc="glm">GLM-5.3-Flash — 1M（多模态）</option>
+<option value="glm-5.2" data-ctx="1048576" data-enc="glm">GLM-5.2 — 1M</option>
+<option value="glm-4.7-flash" data-ctx="204800" data-enc="glm">GLM-4.7-Flash — 200K（免费）</option>
 </optgroup>
 <optgroup label="🇨🇳 其他国内模型">
-<option value="minimax-abab6.5" data-ctx="245760" data-enc="minimax">MiniMax-abab6.5 — 245K</option>
-<option value="yi-large" data-ctx="32768" data-enc="yi">零一万物 Yi-Large — 32K</option>
-<option value="baichuan4" data-ctx="32768" data-enc="baichuan">百川 4 — 32K</option>
+<option value="minimax-m3" data-ctx="201728" data-enc="minimax">MiniMax-M3 — 197K</option>
+<option value="minimax-m2.7" data-ctx="204800" data-enc="minimax">MiniMax-M2.7 — 200K</option>
+<option value="hunyuan-t1" data-ctx="262144" data-enc="hunyuan">腾讯混元 T1 — 256K</option>
+<option value="yi-lightning" data-ctx="16384" data-enc="yi">零一万物 Yi-Lightning — 16K</option>
 <option value="step-2" data-ctx="131072" data-enc="step">阶跃星辰 Step-2 — 128K</option>
-<option value="spark-v3" data-ctx="8192" data-enc="spark">讯飞星火 V3 — 8K</option>
-<option value="hunyuan-pro" data-ctx="32768" data-enc="hunyuan">腾讯混元 Pro — 32K</option>
+<option value="spark-v4" data-ctx="131072" data-enc="spark">讯飞星火 V4 — 128K</option>
 </optgroup>
 </select>
 <span class="spacer"></span>
@@ -547,130 +556,157 @@ const PALETTE = [
 {bg:'rgba(255,107,129,.22)',bd:'rgba(255,107,129,.45)'},{bg:'rgba(72,219,200,.22)',bd:'rgba(72,219,200,.45)'},
 ];
 
+// ═══════════════════════════════════════
+//  服务商默认价格表（费用对比 / 价格计算用）
+//  字段：id=唯一标识；name=显示名；desc=厂商/定位；
+//        input/output=每百万 token 单价；curr=币种（$ 美元 / ¥ 人民币）
+//  数据版本 2026.09，与 global-ai-models.json 对齐
+// ═══════════════════════════════════════
 const DEFAULT_PROVIDERS = [
-// 🌍 OpenAI
+// 🌍 OpenAI（美元）
+{id:'gpt6-astra',name:'GPT-6 Astra',desc:'OpenAI 旗舰',input:10.00,output:50.00,curr:'$'},
+{id:'gpt56-sol',name:'GPT-5.6 Sol',desc:'OpenAI（促销）',input:4.00,output:20.00,curr:'$'},
+{id:'gpt56-terra',name:'GPT-5.6 Terra',desc:'OpenAI 均衡',input:2.00,output:12.00,curr:'$'},
+{id:'gpt56-luna',name:'GPT-5.6 Luna',desc:'OpenAI 轻量',input:0.20,output:1.20,curr:'$'},
 {id:'gpt4o',name:'GPT-4o',desc:'OpenAI',input:2.50,output:10.00,curr:'$'},
 {id:'gpt4o-mini',name:'GPT-4o-mini',desc:'OpenAI',input:0.15,output:0.60,curr:'$'},
-{id:'gpt4-turbo',name:'GPT-4 Turbo',desc:'OpenAI',input:10.00,output:30.00,curr:'$'},
-{id:'gpt35-turbo',name:'GPT-3.5 Turbo',desc:'OpenAI',input:0.50,output:1.50,curr:'$'},
-{id:'o1',name:'o1',desc:'OpenAI推理',input:15.00,output:60.00,curr:'$'},
-{id:'o3-mini',name:'o3-mini',desc:'OpenAI推理',input:1.10,output:4.40,curr:'$'},
-// 🌍 Anthropic
-{id:'claude35',name:'Claude 3.5 Sonnet',desc:'Anthropic',input:3.00,output:15.00,curr:'$'},
-{id:'claude3-opus',name:'Claude 3 Opus',desc:'Anthropic',input:15.00,output:75.00,curr:'$'},
-{id:'claude3-haiku',name:'Claude 3 Haiku',desc:'Anthropic',input:0.25,output:1.25,curr:'$'},
-// 🌍 Google
-{id:'gemini25pro',name:'Gemini 2.5 Pro',desc:'Google',input:1.25,output:10.00,curr:'$'},
-{id:'gemini20flash',name:'Gemini 2.0 Flash',desc:'Google',input:0.10,output:0.40,curr:'$'},
-{id:'gemini15pro',name:'Gemini 1.5 Pro',desc:'Google',input:1.25,output:5.00,curr:'$'},
-// 🌍 Meta
+// 🌍 Anthropic（美元）
+{id:'fable51',name:'Claude Fable 5.1',desc:'Anthropic 旗舰',input:10.00,output:50.00,curr:'$'},
+{id:'mythos51',name:'Claude Mythos 5.1',desc:'Anthropic 限量',input:10.00,output:50.00,curr:'$'},
+{id:'fable5',name:'Claude Fable 5',desc:'Anthropic',input:10.00,output:50.00,curr:'$'},
+{id:'opus5',name:'Claude Opus 5',desc:'Anthropic',input:5.00,output:25.00,curr:'$'},
+{id:'sonnet5',name:'Claude Sonnet 5',desc:'Anthropic 永久价',input:2.00,output:10.00,curr:'$'},
+{id:'sonnet46',name:'Claude Sonnet 4.6',desc:'Anthropic',input:3.00,output:15.00,curr:'$'},
+{id:'haiku45',name:'Claude Haiku 4.5',desc:'Anthropic',input:1.00,output:5.00,curr:'$'},
+// 🌍 Google（美元）
+{id:'gemini38flash',name:'Gemini 3.8 Flash',desc:'Google（促销）',input:0.75,output:3.75,curr:'$'},
+{id:'gemini35flash',name:'Gemini 3.5 Flash',desc:'Google',input:1.50,output:9.00,curr:'$'},
+{id:'gemini31pro',name:'Gemini 3.1 Pro',desc:'Google',input:2.00,output:12.00,curr:'$'},
+{id:'gemini31lite',name:'Gemini 3.1 Flash-Lite',desc:'Google',input:0.25,output:1.50,curr:'$'},
+// 🌍 xAI（美元）
+{id:'grok46',name:'Grok 4.6',desc:'xAI',input:2.00,output:6.00,curr:'$'},
+{id:'grok45',name:'Grok 4.5',desc:'xAI',input:2.00,output:6.00,curr:'$'},
+{id:'grok43',name:'Grok 4.3',desc:'xAI',input:1.25,output:2.50,curr:'$'},
+{id:'grok420',name:'Grok 4.20',desc:'xAI',input:5.00,output:25.00,curr:'$'},
+// 🌍 Meta / Mistral（美元）
 {id:'llama31-405b',name:'Llama 3.1 405B',desc:'Meta (开源)',input:0.00,output:0.00,curr:'$'},
-// 🌍 Mistral
 {id:'mistral-large',name:'Mistral Large',desc:'Mistral',input:2.00,output:6.00,curr:'$'},
-// 🌍 xAI
-{id:'grok-2',name:'Grok-2',desc:'xAI',input:2.00,output:10.00,curr:'$'},
-// 🇨🇳 DeepSeek
-{id:'deepseek-v3',name:'DeepSeek-V3',desc:'深度求索',input:0.27,output:1.10,curr:'¥'},
-{id:'deepseek-r1',name:'DeepSeek-R1',desc:'深度求索推理',input:1.00,output:4.00,curr:'¥'},
-// 🇨🇳 阿里云
+// 🇨🇳 DeepSeek（美元，取"闲时"价；高峰约为 2 倍）
+{id:'deepseek-flash',name:'DeepSeek V4.1-Flash',desc:'深度求索 闲时',input:0.15,output:0.60,curr:'$'},
+{id:'deepseek-v4-pro',name:'DeepSeek V4-Pro-0813',desc:'深度求索 闲时',input:0.66,output:1.98,curr:'$'},
+{id:'deepseek-r1',name:'DeepSeek-R1',desc:'深度求索推理',input:0.14,output:0.42,curr:'$'},
+// 🇨🇳 阿里云（人民币）
+{id:'qwen38max',name:'通义千问 Qwen3.8-Max',desc:'阿里云',input:12.00,output:36.00,curr:'¥'},
+{id:'qwen37max',name:'通义千问 Qwen3.7-Max',desc:'阿里云',input:6.00,output:18.00,curr:'¥'},
 {id:'qwen-max',name:'通义千问-Max',desc:'阿里云',input:2.80,output:11.20,curr:'¥'},
 {id:'qwen-plus',name:'通义千问-Plus',desc:'阿里云',input:0.80,output:2.00,curr:'¥'},
 {id:'qwen-turbo',name:'通义千问-Turbo',desc:'阿里云',input:0.30,output:0.60,curr:'¥'},
-// 🇨🇳 字节跳动
-{id:'doubao-pro',name:'豆包 Pro-256K',desc:'字节跳动',input:0.80,output:2.00,curr:'¥'},
-{id:'doubao-lite',name:'豆包 Lite',desc:'字节跳动',input:0.30,output:0.60,curr:'¥'},
-// 🇨🇳 月之暗面
-{id:'moonshot-v1',name:'Kimi (Moonshot)',desc:'月之暗面',input:3.00,output:12.00,curr:'¥'},
-// 🇨🇳 百度
-{id:'ernie-4',name:'文心一言 4.0',desc:'百度',input:17.14,output:17.14,curr:'¥'},
-{id:'ernie-speed',name:'ERNIE Speed',desc:'百度',input:0.80,output:2.40,curr:'¥'},
-// 🇨🇳 智谱AI
-{id:'glm-4',name:'GLM-4',desc:'智谱AI',input:14.29,output:14.29,curr:'¥'},
-{id:'glm-4-flash',name:'GLM-4 Flash',desc:'智谱AI',input:0.10,output:0.10,curr:'¥'},
-// 🇨🇳 MiniMax
-{id:'minimax-abab',name:'MiniMax-abab6.5',desc:'MiniMax',input:5.00,output:15.00,curr:'¥'},
-// 🇨🇳 零一万物
-{id:'yi-large',name:'Yi-Large',desc:'零一万物',input:2.80,output:11.20,curr:'¥'},
-// 🇨🇳 百川智能
-{id:'baichuan4',name:'百川 4',desc:'百川智能',input:14.29,output:14.29,curr:'¥'},
-// 🇨🇳 阶跃星辰
+// 🇨🇳 字节跳动（人民币）
+{id:'seed21pro',name:'豆包 Seed 2.1 Pro',desc:'字节跳动',input:6.00,output:30.00,curr:'¥'},
+{id:'seed21turbo',name:'豆包 Seed 2.1 Turbo',desc:'字节跳动',input:3.00,output:15.00,curr:'¥'},
+{id:'seed20pro',name:'豆包 Seed 2.0 Pro',desc:'字节跳动',input:3.20,output:16.00,curr:'¥'},
+{id:'seed20mini',name:'豆包 Seed 2.0 Mini',desc:'字节跳动',input:0.20,output:2.00,curr:'¥'},
+{id:'doubao16flash',name:'豆包 1.6 Flash',desc:'字节跳动',input:0.15,output:1.50,curr:'¥'},
+// 🇨🇳 月之暗面（K3 为美元报价，K2.8 为人民币报价）
+{id:'kimi-k3',name:'Kimi K3',desc:'月之暗面',input:3.00,output:15.00,curr:'$'},
+{id:'kimi-k28',name:'Kimi K2.8 Preview',desc:'月之暗面',input:6.50,output:27.00,curr:'¥'},
+// 🇨🇳 百度（人民币）
+{id:'ernie51',name:'文心一言 ERNIE 5.1',desc:'百度',input:4.00,output:18.00,curr:'¥'},
+{id:'ernie-speed',name:'ERNIE Speed',desc:'百度（免费）',input:0.00,output:0.00,curr:'¥'},
+// 🇨🇳 智谱 AI（人民币）
+{id:'glm53',name:'GLM-5.3',desc:'智谱AI',input:8.00,output:28.00,curr:'¥'},
+{id:'glm53flash',name:'GLM-5.3-Flash',desc:'智谱AI 多模态',input:0.80,output:2.80,curr:'¥'},
+{id:'glm52',name:'GLM-5.2',desc:'智谱AI',input:8.00,output:28.00,curr:'¥'},
+{id:'glm47flash',name:'GLM-4.7-Flash',desc:'智谱AI（免费）',input:0.00,output:0.00,curr:'¥'},
+// 🇨🇳 其他国内厂商
+{id:'minimax-m3',name:'MiniMax-M3',desc:'MiniMax',input:0.30,output:1.20,curr:'$'},
+{id:'minimax-m27',name:'MiniMax-M2.7',desc:'MiniMax',input:2.10,output:8.40,curr:'¥'},
+{id:'hunyuan-t1',name:'腾讯混元 T1',desc:'腾讯',input:1.00,output:4.00,curr:'¥'},
+{id:'yi-lightning',name:'零一万物 Yi-Lightning',desc:'零一万物',input:1.00,output:4.00,curr:'¥'},
 {id:'step-2',name:'阶跃星辰 Step-2',desc:'阶跃星辰',input:2.80,output:11.20,curr:'¥'},
-// 🇨🇳 科大讯飞
 {id:'spark-v4',name:'讯飞星火 V4',desc:'科大讯飞',input:2.86,output:8.57,curr:'¥'},
-// 🇨🇳 腾讯
-{id:'hunyuan-pro',name:'腾讯混元 Pro',desc:'腾讯',input:2.86,output:8.57,curr:'¥'},
-// 🇨🇳 商汤
 {id:'sensenova',name:'商汤日日新 5.0',desc:'商汤科技',input:5.00,output:15.00,curr:'¥'},
 ];
 
-// All models for encoding reference
-// cat: 对话/多模态/推理/代码/视频/嵌入
+// ═══════════════════════════════════════
+//  模型编码参考表（"模型库"选项卡展示 + 按上下文智能推荐）
+//  字段：name=显示名；enc=编码家族（与分词器/估算系数对应）；ctx=上下文窗口；
+//        vendor=厂商；cat=类别（对话/多模态/推理/代码/视频/图像/嵌入/音乐）；
+//        ctxCls=上下文样式类（ct-high 大 / ct-mid 中 / ct-low 小）；url=官网链接
+//  数据版本 2026.09，与下拉框名单对齐
+// ═══════════════════════════════════════
 const ALL_MODELS = [
+// —— OpenAI ——
+{name:'GPT-6 Astra',enc:'o200k_base',ctx:1000000,vendor:'OpenAI',cat:'推理',ctxCls:'ct-high',url:'https://chatgpt.com'},
+{name:'GPT-5.6 Sol',enc:'o200k_base',ctx:1050000,vendor:'OpenAI',cat:'推理',ctxCls:'ct-high',url:'https://chatgpt.com'},
+{name:'GPT-5.6 Terra',enc:'o200k_base',ctx:1050000,vendor:'OpenAI',cat:'代码',ctxCls:'ct-high',url:'https://chatgpt.com'},
+{name:'GPT-5.6 Luna',enc:'o200k_base',ctx:1050000,vendor:'OpenAI',cat:'对话',ctxCls:'ct-high',url:'https://chatgpt.com'},
 {name:'GPT-4o',enc:'cl100k_base',ctx:128000,vendor:'OpenAI',cat:'多模态',ctxCls:'ct-high',url:'https://chatgpt.com'},
 {name:'GPT-4o-mini',enc:'cl100k_base',ctx:128000,vendor:'OpenAI',cat:'对话',ctxCls:'ct-high',url:'https://chatgpt.com'},
-{name:'GPT-4 Turbo',enc:'cl100k_base',ctx:128000,vendor:'OpenAI',cat:'对话',ctxCls:'ct-high',url:'https://chatgpt.com'},
-{name:'GPT-4',enc:'cl100k_base',ctx:8192,vendor:'OpenAI',cat:'对话',ctxCls:'ct-low',url:'https://chatgpt.com'},
 {name:'GPT-3.5 Turbo',enc:'cl100k_base',ctx:16385,vendor:'OpenAI',cat:'对话',ctxCls:'ct-mid',url:'https://chatgpt.com'},
-{name:'text-embedding-ada-002',enc:'cl100k_base',ctx:8191,vendor:'OpenAI',cat:'嵌入',ctxCls:'ct-low',url:'https://platform.openai.com'},
-{name:'o1 (推理模型)',enc:'o200k_base',ctx:200000,vendor:'OpenAI',cat:'推理',ctxCls:'ct-high',url:'https://chatgpt.com'},
-{name:'o3-mini',enc:'o200k_base',ctx:200000,vendor:'OpenAI',cat:'推理',ctxCls:'ct-high',url:'https://chatgpt.com'},
 {name:'Sora (视频生成)',enc:'—',ctx:0,vendor:'OpenAI',cat:'视频',ctxCls:'ct-low',url:'https://sora.com'},
-{name:'Claude 3.5 Sonnet',enc:'Claude BPE',ctx:200000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
-{name:'Claude 3 Opus',enc:'Claude BPE',ctx:200000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
-{name:'Claude 3 Haiku',enc:'Claude BPE',ctx:200000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
-{name:'Gemini 2.5 Pro',enc:'SentencePiece',ctx:2097152,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
-{name:'Gemini 2.0 Flash',enc:'SentencePiece',ctx:1048576,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
-{name:'Gemini 1.5 Pro',enc:'SentencePiece',ctx:2097152,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
-{name:'Veo 3 (视频生成)',enc:'—',ctx:0,vendor:'Google',cat:'视频',ctxCls:'ct-low',url:'https://deepmind.google'},
-{name:'Llama 3.1 405B',enc:'Llama3 BPE',ctx:131072,vendor:'Meta',cat:'对话',ctxCls:'ct-high',url:'https://llama.meta.com'},
-{name:'Llama 3.2 多模态',enc:'Llama3 BPE',ctx:131072,vendor:'Meta',cat:'多模态',ctxCls:'ct-high',url:'https://llama.meta.com'},
-{name:'Llama 3 8B',enc:'Llama3 BPE',ctx:8192,vendor:'Meta',cat:'对话',ctxCls:'ct-low',url:'https://llama.meta.com'},
-{name:'Mistral Large',enc:'Mistral BPE',ctx:131072,vendor:'Mistral',cat:'对话',ctxCls:'ct-high',url:'https://mistral.ai'},
-{name:'Mistral Small',enc:'Mistral BPE',ctx:32768,vendor:'Mistral',cat:'对话',ctxCls:'ct-mid',url:'https://mistral.ai'},
-{name:'Cohere Command R+',enc:'Cohere BPE',ctx:131072,vendor:'Cohere',cat:'对话',ctxCls:'ct-high',url:'https://cohere.com'},
-{name:'Grok-2 (xAI)',enc:'Grok BPE',ctx:131072,vendor:'xAI',cat:'对话',ctxCls:'ct-high',url:'https://x.ai'},
-{name:'Grok-1 (xAI)',enc:'Grok BPE',ctx:8192,vendor:'xAI',cat:'对话',ctxCls:'ct-low',url:'https://x.ai'},
-{name:'DeepSeek-V3',enc:'DeepSeek BPE',ctx:65536,vendor:'深度求索',cat:'对话',ctxCls:'ct-mid',url:'https://chat.deepseek.com'},
-{name:'DeepSeek-R1',enc:'DeepSeek BPE',ctx:131072,vendor:'深度求索',cat:'推理',ctxCls:'ct-high',url:'https://chat.deepseek.com'},
-{name:'DeepSeek-Coder',enc:'DeepSeek BPE',ctx:16384,vendor:'深度求索',cat:'代码',ctxCls:'ct-mid',url:'https://chat.deepseek.com'},
-{name:'通义千问-Max',enc:'Qwen BPE',ctx:32768,vendor:'阿里云',cat:'对话',ctxCls:'ct-mid',url:'https://tongyi.aliyun.com'},
-{name:'通义千问-Plus',enc:'Qwen BPE',ctx:131072,vendor:'阿里云',cat:'对话',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
-{name:'通义千问-Long',enc:'Qwen BPE',ctx:10485760,vendor:'阿里云',cat:'对话',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
-{name:'QwQ-Max (推理)',enc:'Qwen BPE',ctx:131072,vendor:'阿里云',cat:'推理',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
-{name:'Qwen-VL (多模态)',enc:'Qwen BPE',ctx:32768,vendor:'阿里云',cat:'多模态',ctxCls:'ct-mid',url:'https://tongyi.aliyun.com'},
+// —— Anthropic ——
+{name:'Claude Fable 5.1',enc:'claude',ctx:1000000,vendor:'Anthropic',cat:'推理',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Claude Mythos 5.1',enc:'claude',ctx:1000000,vendor:'Anthropic',cat:'推理',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Claude Fable 5',enc:'claude',ctx:1000000,vendor:'Anthropic',cat:'推理',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Claude Opus 5',enc:'claude',ctx:1000000,vendor:'Anthropic',cat:'推理',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Claude Sonnet 5',enc:'claude',ctx:1000000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Claude Sonnet 4.6',enc:'claude',ctx:200000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
+{name:'Claude Haiku 4.5',enc:'claude',ctx:200000,vendor:'Anthropic',cat:'对话',ctxCls:'ct-high',url:'https://claude.ai'},
+// —— Google ——
+{name:'Gemini 3.8 Flash',enc:'sentencepiece',ctx:1048576,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
+{name:'Gemini 3.5 Flash',enc:'sentencepiece',ctx:1048576,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
+{name:'Gemini 3.1 Pro',enc:'sentencepiece',ctx:1048576,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
+{name:'Gemini 3.1 Flash-Lite',enc:'sentencepiece',ctx:1048576,vendor:'Google',cat:'多模态',ctxCls:'ct-high',url:'https://gemini.google.com'},
+{name:'Veo (视频生成)',enc:'—',ctx:0,vendor:'Google',cat:'视频',ctxCls:'ct-low',url:'https://deepmind.google'},
+// —— xAI ——
+{name:'Grok 4.6',enc:'grok',ctx:500000,vendor:'xAI',cat:'多模态',ctxCls:'ct-high',url:'https://x.ai'},
+{name:'Grok 4.5',enc:'grok',ctx:500000,vendor:'xAI',cat:'多模态',ctxCls:'ct-high',url:'https://x.ai'},
+{name:'Grok 4.3',enc:'grok',ctx:1000000,vendor:'xAI',cat:'对话',ctxCls:'ct-high',url:'https://x.ai'},
+{name:'Grok 4.20',enc:'grok',ctx:1000000,vendor:'xAI',cat:'推理',ctxCls:'ct-high',url:'https://x.ai'},
+// —— Meta / Mistral ——
+{name:'Llama 3.1 405B',enc:'llama3',ctx:131072,vendor:'Meta',cat:'对话',ctxCls:'ct-high',url:'https://llama.meta.com'},
+{name:'Mistral Large',enc:'mistral',ctx:131072,vendor:'Mistral',cat:'对话',ctxCls:'ct-high',url:'https://mistral.ai'},
+// —— DeepSeek ——
+{name:'DeepSeek V4.1-Flash',enc:'deepseek',ctx:1048576,vendor:'深度求索',cat:'多模态',ctxCls:'ct-high',url:'https://chat.deepseek.com'},
+{name:'DeepSeek V4-Pro-0813',enc:'deepseek',ctx:131072,vendor:'深度求索',cat:'推理',ctxCls:'ct-high',url:'https://chat.deepseek.com'},
+{name:'DeepSeek-R1',enc:'deepseek',ctx:131072,vendor:'深度求索',cat:'推理',ctxCls:'ct-high',url:'https://chat.deepseek.com'},
+// —— 阿里云 ——
+{name:'通义千问 Qwen3.8-Max',enc:'qwen',ctx:1048576,vendor:'阿里云',cat:'对话',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
+{name:'通义千问 Qwen3.7-Max',enc:'qwen',ctx:1048576,vendor:'阿里云',cat:'对话',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
+{name:'通义千问-Max',enc:'qwen',ctx:32768,vendor:'阿里云',cat:'对话',ctxCls:'ct-mid',url:'https://tongyi.aliyun.com'},
+{name:'通义千问-Plus',enc:'qwen',ctx:131072,vendor:'阿里云',cat:'对话',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
+{name:'通义千问-Long',enc:'qwen',ctx:10485760,vendor:'阿里云',cat:'对话',ctxCls:'ct-high',url:'https://tongyi.aliyun.com'},
 {name:'通义万相 (视频)',enc:'—',ctx:0,vendor:'阿里云',cat:'视频',ctxCls:'ct-low',url:'https://tongyi.aliyun.com/wanxiang'},
-{name:'豆包 Pro-256K',enc:'Doubao BPE',ctx:262144,vendor:'字节跳动',cat:'对话',ctxCls:'ct-high',url:'https://www.doubao.com'},
-{name:'豆包 Pro-32K',enc:'Doubao BPE',ctx:32768,vendor:'字节跳动',cat:'对话',ctxCls:'ct-mid',url:'https://www.doubao.com'},
-{name:'豆包 Lite-4K',enc:'Doubao BPE',ctx:4096,vendor:'字节跳动',cat:'对话',ctxCls:'ct-low',url:'https://www.doubao.com'},
+// —— 字节跳动 ——
+{name:'豆包 Seed 2.1 Pro',enc:'doubao',ctx:262144,vendor:'字节跳动',cat:'对话',ctxCls:'ct-high',url:'https://www.doubao.com'},
+{name:'豆包 Seed 2.1 Turbo',enc:'doubao',ctx:262144,vendor:'字节跳动',cat:'对话',ctxCls:'ct-high',url:'https://www.doubao.com'},
+{name:'豆包 Seed 2.0 Pro',enc:'doubao',ctx:262144,vendor:'字节跳动',cat:'对话',ctxCls:'ct-high',url:'https://www.doubao.com'},
+{name:'豆包 Seed 2.0 Mini',enc:'doubao',ctx:131072,vendor:'字节跳动',cat:'对话',ctxCls:'ct-high',url:'https://www.doubao.com'},
 {name:'Seedance (视频)',enc:'—',ctx:0,vendor:'字节跳动',cat:'视频',ctxCls:'ct-low',url:'https://www.doubao.com'},
-{name:'Seedream (图像)',enc:'—',ctx:0,vendor:'字节跳动',cat:'多模态',ctxCls:'ct-low',url:'https://www.doubao.com'},
-{name:'Kimi (Moonshot)',enc:'Moonshot BPE',ctx:131072,vendor:'月之暗面',cat:'对话',ctxCls:'ct-high',url:'https://kimi.moonshot.cn'},
-{name:'文心一言 4.0',enc:'ERNIE BPE',ctx:8192,vendor:'百度',cat:'对话',ctxCls:'ct-low',url:'https://yiyan.baidu.com'},
-{name:'ERNIE Speed',enc:'ERNIE BPE',ctx:131072,vendor:'百度',cat:'对话',ctxCls:'ct-high',url:'https://yiyan.baidu.com'},
-{name:'ERNIE 4.5 (推理)',enc:'ERNIE BPE',ctx:131072,vendor:'百度',cat:'推理',ctxCls:'ct-high',url:'https://yiyan.baidu.com'},
-{name:'GLM-4',enc:'GLM BPE',ctx:131072,vendor:'智谱AI',cat:'对话',ctxCls:'ct-high',url:'https://chatglm.cn'},
-{name:'GLM-4V (多模态)',enc:'GLM BPE',ctx:32768,vendor:'智谱AI',cat:'多模态',ctxCls:'ct-mid',url:'https://chatglm.cn'},
+// —— 月之暗面 ——
+{name:'Kimi K3',enc:'moonshot',ctx:1048576,vendor:'月之暗面',cat:'推理',ctxCls:'ct-high',url:'https://kimi.moonshot.cn'},
+{name:'Kimi K2.8 Preview',enc:'moonshot',ctx:1048576,vendor:'月之暗面',cat:'对话',ctxCls:'ct-high',url:'https://kimi.moonshot.cn'},
+{name:'Kimi K2.7 Code',enc:'moonshot',ctx:262144,vendor:'月之暗面',cat:'代码',ctxCls:'ct-high',url:'https://kimi.moonshot.cn'},
+// —— 百度 ——
+{name:'文心一言 ERNIE 5.1',enc:'ernie',ctx:131072,vendor:'百度',cat:'对话',ctxCls:'ct-high',url:'https://yiyan.baidu.com'},
+{name:'ERNIE Speed',enc:'ernie',ctx:131072,vendor:'百度',cat:'对话',ctxCls:'ct-high',url:'https://yiyan.baidu.com'},
+// —— 智谱 AI ——
+{name:'GLM-5.3',enc:'glm',ctx:1048576,vendor:'智谱AI',cat:'代码',ctxCls:'ct-high',url:'https://chatglm.cn'},
+{name:'GLM-5.3-Flash',enc:'glm',ctx:1048576,vendor:'智谱AI',cat:'多模态',ctxCls:'ct-high',url:'https://chatglm.cn'},
+{name:'GLM-5.2',enc:'glm',ctx:1048576,vendor:'智谱AI',cat:'代码',ctxCls:'ct-high',url:'https://chatglm.cn'},
+{name:'GLM-4.7-Flash',enc:'glm',ctx:204800,vendor:'智谱AI',cat:'对话',ctxCls:'ct-high',url:'https://chatglm.cn'},
 {name:'CogVideoX (视频)',enc:'—',ctx:0,vendor:'智谱AI',cat:'视频',ctxCls:'ct-low',url:'https://chatglm.cn'},
-{name:'MiniMax-abab6.5',enc:'MiniMax BPE',ctx:245760,vendor:'MiniMax',cat:'对话',ctxCls:'ct-high',url:'https://hailuoai.com'},
-{name:'Hailuo AI (视频)',enc:'—',ctx:0,vendor:'MiniMax',cat:'视频',ctxCls:'ct-low',url:'https://hailuoai.com'},
-{name:'零一万物 Yi-Large',enc:'Yi BPE',ctx:32768,vendor:'零一万物',cat:'对话',ctxCls:'ct-mid',url:'https://platform.lingyiwanwu.com'},
-{name:'百川 4',enc:'Baichuan BPE',ctx:32768,vendor:'百川智能',cat:'对话',ctxCls:'ct-mid',url:'https://www.baichuan-ai.com'},
-{name:'阶跃星辰 Step-2',enc:'Step BPE',ctx:131072,vendor:'阶跃星辰',cat:'对话',ctxCls:'ct-high',url:'https://www.stepfun.com'},
-{name:'Step-Video (视频)',enc:'—',ctx:0,vendor:'阶跃星辰',cat:'视频',ctxCls:'ct-low',url:'https://www.stepfun.com'},
-{name:'讯飞星火 V4',enc:'Spark BPE',ctx:131072,vendor:'科大讯飞',cat:'对话',ctxCls:'ct-high',url:'https://xinghuo.xfyun.cn'},
-{name:'腾讯混元 Pro',enc:'Hunyuan BPE',ctx:32768,vendor:'腾讯',cat:'对话',ctxCls:'ct-mid',url:'https://hunyuan.tencent.com'},
-{name:'混元 Video (视频)',enc:'—',ctx:0,vendor:'腾讯',cat:'视频',ctxCls:'ct-low',url:'https://hunyuan.tencent.com'},
-{name:'商汤 日日新 5.0',enc:'SenseNova BPE',ctx:131072,vendor:'商汤科技',cat:'对话',ctxCls:'ct-high',url:'https://platform.sensenova.cn'},
-{name:'Kimi K2 (推理)',enc:'Moonshot BPE',ctx:131072,vendor:'月之暗面',cat:'推理',ctxCls:'ct-high',url:'https://kimi.moonshot.cn'},
-{name:'DALL·E 3 (图像)',enc:'—',ctx:0,vendor:'OpenAI',cat:'多模态',ctxCls:'ct-low',url:'https://chatgpt.com'},
-{name:'Midjourney V6 (图像)',enc:'—',ctx:0,vendor:'Midjourney',cat:'多模态',ctxCls:'ct-low',url:'https://midjourney.com'},
-{name:'Stable Diffusion 3',enc:'—',ctx:0,vendor:'StabilityAI',cat:'多模态',ctxCls:'ct-low',url:'https://stability.ai'},
-{name:'Suno V4 (音乐)',enc:'—',ctx:0,vendor:'Suno',cat:'多模态',ctxCls:'ct-low',url:'https://suno.com'},
-{name:'Udio (音乐)',enc:'—',ctx:0,vendor:'Udio',cat:'多模态',ctxCls:'ct-low',url:'https://udio.com'},
+// —— 其他国内厂商 ——
+{name:'MiniMax-M3',enc:'minimax',ctx:201728,vendor:'MiniMax',cat:'对话',ctxCls:'ct-high',url:'https://hailuoai.com'},
+{name:'MiniMax-M2.7',enc:'minimax',ctx:204800,vendor:'MiniMax',cat:'对话',ctxCls:'ct-high',url:'https://hailuoai.com'},
+{name:'腾讯混元 T1',enc:'hunyuan',ctx:262144,vendor:'腾讯',cat:'推理',ctxCls:'ct-high',url:'https://hunyuan.tencent.com'},
+{name:'零一万物 Yi-Lightning',enc:'yi',ctx:16384,vendor:'零一万物',cat:'对话',ctxCls:'ct-mid',url:'https://platform.lingyiwanwu.com'},
+{name:'阶跃星辰 Step-2',enc:'step',ctx:131072,vendor:'阶跃星辰',cat:'对话',ctxCls:'ct-high',url:'https://www.stepfun.com'},
+{name:'讯飞星火 V4',enc:'spark',ctx:131072,vendor:'科大讯飞',cat:'对话',ctxCls:'ct-high',url:'https://xinghuo.xfyun.cn'},
+{name:'商汤日日新 5.0',enc:'sensenova',ctx:131072,vendor:'商汤科技',cat:'对话',ctxCls:'ct-high',url:'https://platform.sensenova.cn'},
 {name:'可灵 Kling (视频)',enc:'—',ctx:0,vendor:'快手',cat:'视频',ctxCls:'ct-low',url:'https://kling.kuaishou.com'},
-{name:'即梦 Jimeng (视频)',enc:'—',ctx:0,vendor:'字节跳动',cat:'视频',ctxCls:'ct-low',url:'https://jimeng.jianying.com'},
-{name:'Pika 2.0 (视频)',enc:'—',ctx:0,vendor:'Pika Labs',cat:'视频',ctxCls:'ct-low',url:'https://pika.art'},
-{name:'Runway Gen-4 (视频)',enc:'—',ctx:0,vendor:'Runway',cat:'视频',ctxCls:'ct-low',url:'https://runwayml.com'},
+{name:'Runway (视频)',enc:'—',ctx:0,vendor:'Runway',cat:'视频',ctxCls:'ct-low',url:'https://runwayml.com'},
 ];
 
 let tokenData=[], activeTokenIdx=-1, providers=[...DEFAULT_PROVIDERS];
@@ -679,15 +715,20 @@ let currentCtx=128000, currentEnc='cl100k_base';
 let encodingCache={}; // cache loaded gpt-tokenizer encodings
 
 // Encoding → gpt-tokenizer module path mapping
+// 分词器动态加载表（仅 OpenAI 系编码可用官方同款真实分词器；其余编码走字符比例估算）
+// 键名必须与下拉框 option 的 data-enc 完全一致
 const ENCODING_IMPORT = {
-'cl100k_base':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/cl100k_base.js',
+'o200k_base':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/o200k_base.js', // GPT-6 / GPT-5.x 新一代编码
+'cl100k_base':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/cl100k_base.js', // GPT-4/4o/3.5 标准编码
 'p50k_base':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/p50k_base.js',
 'p50k_edit':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/p50k_edit.js',
 'r50k_base':'https://cdn.jsdelivr.net/npm/gpt-tokenizer@2.8.1/esm/encoding/r50k_base.js',
 };
 
 // Estimation ratios: chars-per-token for different encoding families
+// 各编码家族的"每 token 字符数"估算系数：en=非中文字符，cn=中文字符
 const ENCODING_RATIO = {
+'o200k_base':{en:0.24,cn:1.4}, // GPT-6/5.x：词表更大，多语言更省 token
 'cl100k_base':{en:0.25,cn:1.6}, // GPT-4/3.5 standard
 'p50k_base':{en:0.28,cn:1.8},   // GPT-3 era, slightly less efficient
 'p50k_edit':{en:0.28,cn:1.8},
