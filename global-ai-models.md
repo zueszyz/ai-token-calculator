@@ -1,6 +1,6 @@
-# 全球 AI 大模型数据文档（2026.09 更新）
+# 全球 AI 大模型数据文档（2026.09 更新，扩展版）
 
-> 本文档包含截至 2026 年 9 月的全球主流 AI 大模型的详细信息，包括编码方案、上下文窗口、输入/输出定价等，用于 `token-calculator.html` 的数据更新。本次更新重点：OpenAI GPT-6 Astra 发布、GPT-5.6 全系调价、Claude Fable 5.1 与 Sonnet 5 永久定价、Gemini 3.8 Flash 促销、Grok 4.6 旗舰、DeepSeek V4.1-Flash 与峰谷定价、Qwen3.8-Max、Kimi K2.8 Preview、GLM-5.3 等。
+> 本文档包含截至 2026 年 9 月的全球主流 AI 大模型的详细信息，包括编码方案、上下文窗口、输入/输出定价等，用于 `token-calculator.html` 的数据更新。本次扩展版补全：OpenAI 实时语音/图像/视频/Codex/Cyber 系列、Claude Opus 4.5、Gemini 3 Flash Preview/Veo 3.1/Embedding、Grok 4.20 Multi-Agent/Code Fast 1/Grok 3、DeepSeek V3.2-Speciale、Amazon Nova Micro/Act/Sonic 系列、腾讯 Hy4/a13b/HY 2.0 Think 全线、ERNIE X1 Turbo/5.0、智谱 GLM-OCR/4.6V、字节 Seed-2-1-Pro 1M 版、Mistral Large 3/Medium 3.5/Small 4/Codestral、Meta Llama 4 Maverick/Scout、快手 Kling-V3 系列、Runway Gen-4 等。
 
 ---
 
@@ -206,6 +206,23 @@
 - **GPT-Image-2.5 Sunburst / Flare**：图片输入 $8.00、缓存 $2.00、输出 $30.00；文字输入 $5.00、缓存 $1.25（每百万 Token）
 - **GPT-Live-1**（实时语音）：$0.05/分钟（$0.00083/秒）
 
+### OpenAI 其他活跃模型（2026 年在售）
+
+| 模型 | 发布日期 | 输入价格 | 输出价格 | 上下文 | 编码 | 特点 |
+|-----|---------|---------|---------|-------|------|------|
+| **GPT-Realtime-2.1** | 2026 | 音频$32/文本$4 | 音频$64/文本$24 | ~200K | o200k_base | 实时语音旗舰，图像输入$5 |
+| **GPT-Realtime-2.1 mini** | 2026 | 音频$10/文本$0.60 | 音频$20/文本$2.40 | ~200K | o200k_base | 实时语音轻量 |
+| **GPT-Image-2.5**（Sunburst/Flare） | 2026 | 图$8/文$5 | $30 | — | o200k_base | 图像生成旗舰，取代 DALL·E 3/gpt-image-1 |
+| **Sora-2** | 2026 | $0.10/秒 | — | 720p | — | 视频生成按秒计费 |
+| **Sora-2 Pro** | 2026 | $0.30–0.70/秒 | — | 720p/1080p | — | 视频生成旗舰 |
+| **o4-mini** | 2025-04-16 | $4.00 | $16.00 | 200K | o200k_base | 推理轻量，文档仅收 o1/o3-mini，此为补充 |
+| **gpt-5.3-codex** | 2026 | $1.75 | $14.00 | — | o200k_base | Codex 代码专用 |
+| **gpt-5.6-cyber**（Daybreak Red） | 2026 | $12.50 | $75.00 | — | o200k_base | 网络安全旗舰（Daybreak Blue 即 5.6 Sol） |
+| **gpt-rosalind-research** | 2026-10 计费 | $5.00 | $25.00 | — | o200k_base | 生命科学专用（受信访问） |
+| **语音转写系列** | 2026 | $0.0045–0.034/分钟 | — | — | — | gpt-transcribe/realtime-whisper/live-transcribe/realtime-translate |
+
+> **历史型号说明**：`gpt-4.1/4.1-mini/4.1-nano`、`o3/o3-pro`、`text-embedding-3`、`DALL·E 3`、`gpt-image-1` 在 2026 年官方定价表已不再作为计费项（仅 Playground 残留/已下线），本文不收录其当前价格。
+
 ### GPT-5.6 系列（2026年7月发布，2026年9月调价）
 
 **发布背景**：GPT-5.6 并非全新架构，而是 GPT-5.x 家族的"同代精进"。核心优化方向：
@@ -351,6 +368,7 @@ GPT-5.6 Luna 是 5.6 家族中最轻量的模型，主打低延迟和高吞吐�
 | **Claude Sonnet 5** | 2026-06-30 | $2.00（永久） | $10.00（永久） | $0.20 | 1M | $2/$10 已永久化为标准价，新 Tokenizer |
 | **Claude Sonnet 4.6** | 2026-02-21 | $3.00 | $15.00 | $0.30 | 200K | 中端，已取消 200K+ 溢价 |
 | **Claude Haiku 4.5** | 2025-10-17 | $1.00 | $5.00 | $0.10 | 200K | 轻量 |
+| **Claude Opus 4.5** | 2025-12 | $5.00 | $25.00 | $0.50 | 200K | 活跃在售（4.6 前一代，文档原从 4.6 起跳过 4.5） |
 
 > **重要更新（2026-09）**：① 新增 **Claude Fable 5.1 / Mythos 5.1**，缓存命中采用 0.025x 特殊倍率（$0.25），5 分钟 Cache Write $12.50、1 小时 Cache Write $20；② **Claude Sonnet 5 的 $2/$10 促销价已永久化为标准价**——原定 2026-09-01 涨至 $3/$15 的计划取消；③ Claude 4.7 及以上使用新 Tokenizer，同文本 token 数约多 30%。
 
@@ -497,6 +515,11 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | **Gemini 3.1 Pro** | 2026-02-21 | $2.00 | $12.00 | 1M | 旗舰多模态，支持原生图像生成 |
 | **Gemini 3.1 Flash-Lite** | 2026-03-04 | $0.25 | $1.50 | 1M | 最轻量 |
 | **Gemini 2.5 Pro / Flash / Flash-Lite** | 2025 年 | — | — | 1–2M | 全系已退役（2026-06-17） |
+| **Gemini 3 Flash Preview** | 2026 preview | $0.50 | $3.00 | 1M | 早一代预览版，音频输入$1 |
+| **Gemini 3.1 Flash Image**（Nano Banana 2） | 2026 | $0.50 | $3（文本）/$60（图像） | 1M | 原生图像生成 |
+| **Gemini 3.1 Pro Image**（Nano Banana Pro） | 2026 | $2.00 | $12/$120 | 1M | 旗舰图像生成 |
+| **Veo 3.1 Fast / Lite** | 2026 | $0.05–0.30/秒 | — | — | 视频生成（含音频），按秒计费 |
+| **Gemini Embedding**（text-embedding-gecko） | 2026 | $0.00015/1K | 免费 | — | Vertex AI 上的嵌入模型 |
 
 > **促销说明**：Gemini 3.6/3.7/3.8 Flash 促销价 $0.75/$3.75，有效期至 **2026-12-31**；2027 年起恢复标准价 $1.50/$7.50。缓存命中 $0.075（≤200K）/$0.15（>200K）。
 > **传闻（未官宣）**：Gemini 4 Pro（代号 Argon）灰测中，本文不收录其价格。
@@ -537,6 +560,10 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | **Grok 4.20** | 2026-04-04 | $5.00 | $25.00 | 1M | 推理/非推理同价 |
 | **grok-build-0.1** | 2026 | $1.00 | $2.00 | 256K | 代码特化 |
 | **Grok 4.1 Fast / 4 / 3** | 2025 年 | — | — | — | 已于 2026-05-15 退役，旧调用按 4.3 费率计费 |
+| **Grok 4.20 Multi-Agent** | 2026 | $10.00 | $50.00 | 2M | 4 智能体内部并行辩论 |
+| **Grok Code Fast 1** | 2026 | $0.20 | $1.50（缓存$0.02） | — | 代码特化，190 tokens/s |
+| **Grok 3 / 3 Mini** | 2025-02 | $3.00 | $15.00 | 1M / 200K | xAI docs 仍标注在售（早期主力） |
+| **Grok 4 Heavy** | 2025-07 | 订阅$300/月 | — | 256K | 多智能体并行，HLE 44.4%（非 token 计价） |
 
 **编码方案**：Grok BPE（基于 BPE 自研）
 
@@ -550,8 +577,9 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 |-----|---------|-------|---------|-----|------|
 | **DeepSeek-V4.1-Flash**（`deepseek-flash`） | 2026-09-10 | 1M | 384K | 2500 | 最新，原生多模态，552B 非对称 MoE（输入激活 8B/输出激活 16B） |
 | **DeepSeek-V4-Pro-0813**（`deepseek-v4-pro`） | 2026-08-13 | 128K | — | 500 | 旗舰正式版，2026-09-14 后继续提供、计费不变 |
-| **DeepSeek R1**（`deepseek-reasoner`） | 2025-01-20 | 128K | — | — | 推理模型 |
+| **DeepSeek R1**（`deepseek-reasoner`） | 2025-01-20 | 128K | — | — | 推理模型（当前底层实为 DeepSeek-V3.2，采用 DSA 注意力，¥1/¥12） |
 | **DeepSeek V3**（`deepseek-chat`） | 2024-12-26 | 128K | — | — | 对话模型 |
+| **DeepSeek-V3.2-Speciale** | 2025-12 | 128K | — | — | 临时端点，IMO/IOI 金牌级数学，无工具调用（同 V3.2 价） |
 
 > **旧模型名兼容**：`deepseek-v4-flash`、`deepseek-v4-flash-vision-exp` 均路由到 V4.1-Flash（`deepseek-flash`）。
 
@@ -608,6 +636,8 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | **Nova Premier** | 2025-05-02 | $10.00 | $40.00 | 1M | Amazon 自研旗舰 |
 | **Nova 2 Pro** | 2025-12-13 | $1.51 | $12.50 | 500K | 中端 |
 | **Nova 2 Lite** | 2025-12-13 | $0.36 | $3.01 | 500K | 轻量 |
+| **Nova Micro** | 2026 | — | — | — | 轻量级，常用于 text-to-SQL 场景 |
+| **Nova Act / Sonic / Canvas / Reel / Forge** | 2026 | — | — | — | Agent / 语音 / 图像 / 视频 / 订阅产品线（非 token 计价） |
 
 ---
 
@@ -634,6 +664,7 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 |-----|-----------|-----------|-------|------|
 | doubao-seed-evolving | 6.00 | 30.00 | 256K | 持续进化版 |
 | doubao-seed-2.1-pro | 6.00 | 30.00 | 256K | 新一代旗舰 |
+| doubao-seed-2-1-pro-260915 | 6.00 | 30.00 | 1M | Pro 1M 上下文版（260628 仅 256K） |
 | doubao-seed-2.1-turbo | 3.00 | 15.00 | 256K | 高性价比 |
 | seed-2.0-pro | 3.20 / 4.80 / 9.60 | 16 / 24 / 48 | 256K | 三档：≤32K / ≤128K / ≤256K |
 | seed-2.0-mini | 0.20 | 2.00 | 128K | 高性价比 |
@@ -647,8 +678,15 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 
 | 模型 | 输入价格(¥) | 输出价格(¥) | 上下文 | 特点 |
 |-----|-----------|-----------|-------|------|
+| Tencent Hy4 preview | — | — | 960K in/64K out | 2026-08-28 新一代旗舰，770B/49B 激活，Agent+Coding |
+| Hunyuan-a13b | 0.50 | 2.00 | 128K | 默认推理主力（13B 激活） |
+| Tencent HY 2.0 Think | 3.975 | 15.90 | 128K | 推理旗舰 |
 | 混元 T1 | 1.00 | 4.00 | 128K | 旗舰推理，性价比突出 |
+| Hunyuan-role-latest | 2.40 | 9.60 | 128K | 角色扮演专用 |
+| Hunyuan-translation / -lite | 1.20 / 1.00 | 3.60 / 3.00 | — | 翻译专用 |
+| Hunyuan-turbos-vision / t1-vision / -video | 3.00 | 9.00 | 128K | 多模态视觉/视频 |
 | 混元 TurboS | 0.80 | 2.00 | 128K | 性能均衡 |
+| Hunyuan-embedding | 0.70 | 0.70 | — | 向量模型 |
 | 混元 Standard | 0.50 | 1.00 | 128K | 通用场景 |
 | 混元 Lite | 免费 | 免费 | — | 轻量版 |
 
@@ -657,6 +695,8 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | 模型 | 输入价格(¥) | 输出价格(¥) | 上下文 | 特点 |
 |-----|-----------|-----------|-------|------|
 | ERNIE 5.1 | 4.00 | 18.00 | 128K | 最新旗舰 |
+| ERNIE X1 Turbo | — | — | — | 长思维链深度思考（最新） |
+| ERNIE 5.0 | — | — | — | 原生全模态（早于 5.1） |
 | ERNIE 4.0 Turbo | 3.00 | 9.00 | 128K | 高性能 |
 | ERNIE 4.0 | 3.00 | 9.00 | 128K | — |
 | ERNIE 3.5 | 0.80 | 2.00 | — | 通用场景 |
@@ -673,6 +713,9 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | GLM-5.2 | 8.00 | 28.00 | 1M | 上一代旗舰，缓存命中 ¥2 |
 | GLM-5.1 | 6–8 | 24–28 | 1M | 更早旗舰，按长度分档 |
 | GLM-5V-Turbo | 5–7 | 22–26 | — | 视觉模型，按 32K 分档 |
+| GLM-4.6V | 1–2 | 3–6 | 128K | 付费视觉模型（分档） |
+| GLM-4.6V-FlashX | 0.15–0.3 | 1.5–3 | 128K | 高速视觉版 |
+| GLM-OCR | 0.20 | 0.20 | 32K | 专用 OCR（PDF/图片） |
 | GLM-4.7-Flash | 免费 | 免费 | 200K | 完全免费（含缓存） |
 
 **备注**：**GLM-5（含 GLM-5-Turbo）将于 2026-10-09 下线**；调用 GLM-5.2/5.1 自动切换至 GLM-5.3，调用 GLM-5-Turbo/GLM-4.7 自动切换至 GLM-5.3-Flash。缓存存储目前限时免费。
@@ -707,6 +750,16 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | 阶跃星辰 | Step-3.7-Flash | 1.35 | 8.10 | 性价比 |
 | 商汤科技 | 日日新 6.5 | ~4.50 | ~9.00 | 公测中 |
 | 科大讯飞 | 星火 4.0 Ultra | ~5.00 | ~10.00 | 旗舰 |
+| Mistral AI | Mistral Large 3 | $0.50（$） | $1.50（$） | 旗舰 41B-A675B MoE（2025-12-02） |
+| Mistral AI | Mistral Medium 3.5 | $1.50（$） | $7.50（$） | 生产部署主力 |
+| Mistral AI | Mistral Small 4 | $0.15（$） | $0.60（$） | 统一推理+视觉+代码（2026-03-16） |
+| Mistral AI | Codestral | $0.30（$） | $0.90（$） | 代码专用，FIM，256K 上下文 |
+| Meta | Llama 4 Maverick | $0.15–0.35（$） | $0.60–1.00（$） | 400B/17B-A，1M 上下文，128E 多模态（2025-04-05） |
+| Meta | Llama 4 Scout | — | — | 109B/17B-A，10M 上下文，16E（开源） |
+| 快手 | Kling-V3 | — | $0.43/秒 | 视频旗舰，原生 4K |
+| 快手 | Kling-V3-Turbo | — | $0.18/秒 | 视频性价比版 |
+| 快手 | Kling-V3-Image-Gen | ¥0.2/张 | ¥0.2/张 | 文生图（1K/2K 同价） |
+| Runway | Gen-4 / Gen-4 Turbo | 按秒/credit | — | 视频生成（非 token 计费） |
 
 ---
 
@@ -842,6 +895,13 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | DeepSeek V4-Pro-0813 | 深度求索 | $0.66/$1.98（闲时） | 峰谷定价旗舰 |
 | GLM-5.3 | 智谱 AI | ¥8/¥28 | 编程旗舰 |
 | Qwen3.8-Max | 阿里云 | ¥12/¥36 | 2.4 万亿 MoE |
+| Claude Opus 4.5 | Anthropic | $5/$25 | 4.6 前一代，仍活跃在售 |
+| Tencent Hy4 preview | 腾讯 | — | 770B/49B 激活，960K 上下文 |
+| Hunyuan-a13b | 腾讯 | ¥0.5/¥2 | 默认推理主力 |
+| Grok 4.20 Multi-Agent | xAI | $10/$50 | 4 智能体并行辩论，2M 上下文 |
+| ERNIE X1 Turbo | 百度 | — | 长思维链深度思考 |
+| Mistral Large 3 | Mistral | $0.5/$1.5 | 41B-A675B MoE 旗舰 |
+| Llama 4 Maverick | Meta | $0.15–0.35/$0.6–1 | 1M 上下文，128E 多模态 |
 
 #### 性价比模型
 | 模型 | 厂商 | 价格 | 特点 |
@@ -852,6 +912,11 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | GPT-5.6 Luna | OpenAI | $0.20/$1.20 | 轻量，9 月大降价 |
 | GPT-5.4 nano | OpenAI | $0.20/$1.25 | 极致性价比 |
 | Grok 4.3 | xAI | $1.25/$2.50 | 1M 高性价比 |
+| Grok Code Fast 1 | xAI | $0.20/$1.50 | 代码特化，190 tok/s |
+| Mistral Small 4 | Mistral | $0.15/$0.60 | 推理+视觉+代码统一 |
+| Hunyuan-a13b | 腾讯 | ¥0.5/¥2 | 默认推理主力 |
+| GLM-OCR | 智谱 AI | ¥0.2/¥0.2 | 专用 OCR |
+| Llama 4 Maverick | Meta | $0.15–0.35/$0.6–1 | 多模态开源旗舰 |
 | 豆包 Seed-1.6-Flash | 字节跳动 | ¥0.15/¥1.50 | 低价快速 |
 | ERNIE Speed | 百度 | 免费 | 长期免费 |
 | GLM-4.7-Flash | 智谱 AI | 免费 | 完全免费 |
@@ -871,6 +936,12 @@ Claude Sonnet 5 是 Anthropic 中端主力模型的最新一代，首次在 Sonn
 | 通义千问-Long | 阿里云 | 10M | Qwen BPE |
 | Kimi K3 / K2.8 | 月之暗面 | 1M | Moonshot BPE |
 | DeepSeek V4.1-Flash | 深度求索 | 1M | DeepSeek BPE |
+| Grok 4.20 Multi-Agent | xAI | 2M | Grok BPE |
+| Llama 4 Maverick | Meta | 1M | Llama3 BPE |
+| Llama 4 Scout | Meta | 10M | Llama3 BPE |
+| Tencent Hy4 preview | 腾讯 | 960K in/64K out | Hunyuan BPE |
+| doubao-seed-2-1-pro-260915 | 字节跳动 | 1M | Doubao BPE |
+| Codestral | Mistral | 256K | Mistral BPE |
 
 #### 免费模型
 | 模型 | 厂商 | 上下文 | 特点 |
