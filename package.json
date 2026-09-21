@@ -6,7 +6,10 @@
   "main": "electron-main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --publish never"
+    "bump": "node bump-version.js",
+    "dist": "node bump-version.js && electron-builder --publish never",
+    "dist:zip": "node bump-version.js && node build-electron.js",
+    "release": "node bump-version.js && electron-builder --publish never"
   },
   "build": {
     "appId": "com.ai-token-calculator.pro",

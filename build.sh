@@ -8,6 +8,10 @@ echo "║   AI Token Calculator Pro — Packager    ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
 
+# [0/2] 自动递增版本号（patch +1，写回 package.json）
+echo "[0/2] 自动递增版本号..."
+node bump-version.js && VERSION=$(node -p "require('./package.json').version") && echo "  当前版本: $VERSION"
+
 rm -rf pkg
 mkdir -p pkg/win-x64 pkg/macos pkg/linux-x64
 
@@ -51,9 +55,10 @@ echo "  ✅ Done"
 
 echo "[2/2] Creating archives..."
 cd pkg
-zip -r ai-token-calculator-win-x64.zip win-x64/
-zip -r ai-token-calculator-macos.zip macos/
-tar -czf ai-token-calculator-linux-x64.tar.gz linux-x64/
+# 产物文件名嵌入版本号，例如 ai-token-calculator-win-x64-1.0.1.zip
+zip -r "ai-token-calculator-win-x64-${VERSION}.zip" win-x64/
+zip -r "ai-token-calculator-macos-${VERSION}.zip" macos/
+tar -czf "ai-token-calculator-linux-x64-${VERSION}.tar.gz" linux-x64/
 cd ..
 
 echo ""

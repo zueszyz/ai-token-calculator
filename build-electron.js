@@ -201,6 +201,15 @@ function main() {
   console.log();
 
   try {
+    // 步骤 0: 自动递增版本号（patch 段 +1），写回 package.json
+    // 这样后续 createPortableZip() 读取的 version 就是本次发行的新版本
+    console.log('[0/5] 自动递增版本号...');
+    try {
+      execSync('node bump-version.js', { stdio: 'inherit', cwd: PROJECT_DIR });
+    } catch (e) {
+      console.warn('  警告: 版本号递增失败，继续使用当前版本');
+    }
+
     // 清理旧的 dist 目录
     cleanDir(DIST_DIR);
     ensureDir(DIST_DIR);

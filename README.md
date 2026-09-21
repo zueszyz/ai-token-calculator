@@ -156,12 +156,6 @@ ai-token-calculator/
 | `Moonshot BPE` | 月之暗面 | 131,072 | Kimi 系列 |
 | `ERNIE / GLM / MiniMax / Yi BPE` 等 | 国内各厂商 | 65K–150K | 文心、GLM、MiniMax、Yi 等 |
 
-### 🧩 子项目：reqnav
-
-`reqnav/` 是一个**独立的「需求导航」浏览器侧栏插件**（零依赖 Vanilla JS），
-可注入到 DeepSeek Harness 等对话式 AI Web 界面中，自动识别需求列表、点击跳转、
-键盘翻页、宽度拖动、localStorage 持久化。它与本计算器无代码耦合，
-文档与自测方式见 [reqnav/README.md](reqnav/README.md)。
 
 ### 📦 发行包构建方式一览
 
@@ -170,8 +164,19 @@ ai-token-calculator/
 | `npm run dist` | `dist-electron/AI-Token-Calculator-Pro-1.0.0.exe` | Windows 免安装单文件（官方首选） |
 | `node build-electron.js` | `dist-electron/*.zip`（含 exe 与运行时） | electron-builder 失败时的备选 |
 | `build-standalone.bat` | `dist-standalone/AI-Token-Calculator-{Win,Mac,Linux}.zip` | 纯 HTML + 启动器，目标机器无需 Node |
-| `build.bat` | `ai-token-calculator-{win,mac,linux}.zip` | HTML + server-embed.js，目标机器需安装 Node |
+| `build.bat` | `ai-token-calculator-{win,mac,linux}-<version>.zip` | HTML + server-embed.js，目标机器需安装 Node |
 | `build.sh` | `pkg/` 下 zip / tar.gz | 同上，含中文命名的各平台启动器 |
+
+### 🔁 自动版本号递增
+
+每次执行打包脚本（`npm run dist` / `npm run dist:zip` / `build.bat` / `build-standalone.bat` / `build.sh`）都会：
+1. **自动递增 `package.json` 的 patch 段**（1.0.0 → 1.0.1 → 1.0.2 ...）
+2. **把新版本号嵌入产物文件名**（如 `AI-Token-Calculator-Pro-1.0.1.zip`）
+
+底层由 [`bump-version.js`](bump-version.js) 实现，仅修改 `package.json`、不创建 git commit/tag。如需跳过递增（保留当前版本），可直接调用底层命令：
+```powershell
+npx electron-builder --publish never   # 不递增，直接打包当前版本
+```
 
 ### 📄 许可证
 
