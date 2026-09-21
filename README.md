@@ -1,6 +1,6 @@
 # AI Token Calculator Pro
 
-> 🧮 实时 Token 计数 · 85 个模型编码速查 · K/M 十进制换算 · 65 家服务商价格对比
+> 🧮 实时 Token 计数 · 74 个模型编码速查 · K/M 十进制换算 · 65 家服务商价格对比
 
 [中文](#中文) | [English](#english)
 
@@ -15,8 +15,8 @@
 | 模块 | 说明 |
 | --- | --- |
 | 🔤 **实时分词（左栏）** | 输入任意文本即时切分 Token，每个 Token 用不同底色可视化；点击单个 Token 可查看其 **Token 内容 / ID / 位置 / 字节数**；左右分栏宽度可拖动 |
-| 🧠 **模型选择器** | 内置 60 个模型，切换后自动套用对应编码方案；模型旁显示**上下文窗口占用徽标**（绿色=充足 / 粉色=超限），实时判断文本能否装得下 |
-| 📊 **对比选项卡** | 53 家内置服务商的输入费 / 输出费 / 总费用明细表，**最便宜的一项自动高亮**，美元与人民币混合计价 |
+| 🧠 **模型选择器** | 内置 69 个模型，切换后自动套用对应编码方案；模型旁显示**上下文窗口占用徽标**（绿色=充足 / 粉色=超限），实时判断文本能否装得下 |
+| 📊 **对比选项卡** | 65 家内置服务商的输入费 / 输出费 / 总费用明细表，**最便宜的一项自动高亮**，美元与人民币混合计价 |
 | 🔢 **1K=1000 选项卡** | 专门解释 AI 行业十进制惯例（1K=1,000、1M=1,000,000，区别于计算机 1024 二进制），支持 `K / M / 千 / 万 / 亿` 简写输入 |
 | 🧬 **编码选项卡** | 全部模型家族的分词器（Tokenizer）架构、词表大小、适用模型速查表 |
 | 🖼 **图片选项卡** | 按图片尺寸（宽 × 高）估算 GPT-4o Vision 等多模态模型的图片 Token 与费用 |
@@ -119,7 +119,7 @@ ai-token-calculator/
 └── .gitignore
 ```
 
-### 🧬 支持模型（HTML 模型库内嵌 85 个，选择器收录 60 个）
+### 🧬 支持模型（HTML 模型库内嵌 74 个，选择器收录 69 个）
 
 | 分类 | 代表模型 |
 | --- | --- |
@@ -137,7 +137,7 @@ ai-token-calculator/
 | 🇨🇳 其他国内厂商 | MiniMax-M3/M2.7、腾讯混元 T1、Hunyuan-a13b、Tencent Hy4 preview、零一万物 Yi-Lightning、阶跃星辰 Step-2、讯飞星火 V4、商汤日日新 5.0、快手可灵、Runway |
 
 > `global-ai-models.json`（2026.09-extended 版）已收录 GPT-6 Astra、Claude Fable 5.1、Gemini 3.8 Flash、
-> DeepSeek V4.1-Flash/V4-Pro-0813、GLM-5.3、Kimi K3、Qwen3.8-Max 等 **94 个新一代模型**数据，
+> DeepSeek V4.1-Flash/V4-Pro-0813、GLM-5.3、Kimi K3、Qwen3.8-Max 等 **94 个新一代模型**数据（HTML 模型库实测 74 个 + 65 条定价），
 > 是同步更新 HTML 内嵌模型表的数据源。
 
 ### 🔢 Token 编码参考
@@ -184,7 +184,7 @@ ai-token-calculator/
 ### Overview
 
 A powerful, self-contained AI Token Calculator with real-time token visualization,
-85 embedded AI models and multi-provider price comparison (65 built-in providers, USD & CNY).
+74 embedded AI models and multi-provider price comparison (65 built-in providers, USD & CNY).
 Runs entirely in the browser; a local Node.js server or Electron wrapper unlocks the exact tokenizer.
 
 ### Features
@@ -213,7 +213,7 @@ Runs entirely in the browser; a local Node.js server or Electron wrapper unlocks
   loaded on demand via ES modules (`o200k_base`, `cl100k_base`, `p50k_base`, `p50k_edit`, `r50k_base`)
 - **Offline fallback**: encoding-family-aware ratio estimation for Chinese / English text
 - **Desktop**: Electron 43 + electron-builder (portable Windows target); alternative Python/pywebview build
-- **Data**: `global-ai-models.md` / `global-ai-models.json` (data release 2026.09-extended, 94 next-generation models)
+- **Data**: `global-ai-models.md` / `global-ai-models.json` (data release 2026.09-extended, 74 embedded models + 65 pricing entries)
 
 ### License
 
