@@ -24,6 +24,7 @@ copy /y "token-calculator.html" "dist-standalone\mac\" >nul
 copy /y "token-calculator.html" "dist-standalone\linux\" >nul
 copy /y "launcher.ps1" "dist-standalone\win\" >nul
 copy /y "launcher-mac.sh" "dist-standalone\mac\" >nul
+copy /y "launcher-mac.sh" "dist-standalone\linux\" >nul
 echo   OK
 
 echo [2/2] Creating ZIP packages...

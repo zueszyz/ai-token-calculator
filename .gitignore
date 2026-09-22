@@ -5,6 +5,7 @@ node_modules/
 dist/
 dist-electron/
 dist-standalone/
+.eb-cache/
 build/
 *.spec
 *.pyc
